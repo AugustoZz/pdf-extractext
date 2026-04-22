@@ -5,15 +5,17 @@
 **Universidad Tecnológica Nacional — Facultad Regional San Rafael**
 **Ingeniería en Sistemas | Desarrollo de Software 2026**
 
+**Integrantes: Mansalve Augusto, Praderio Valentín, Quiroga Constanza**
+
 ---
 
-## 📋 Descripción
+## Descripción
 
 `pdf-extractext` permite a los usuarios enviar archivos PDF y obtener el texto extraído. El sistema valida el archivo, genera un checksum para evitar duplicados y persiste el contenido en una base de datos no relacional (MongoDB). Expone una API REST construida con FastAPI.
 
 ---
 
-## 🚀 Tecnologías
+## Tecnologías
 
 | Tecnología | Uso |
 |---|---|
@@ -26,7 +28,7 @@
 
 ---
 
-## 🏗️ Arquitectura del Proyecto
+## Arquitectura del Proyecto
 
 ```
 pdf-extractext/
@@ -52,22 +54,9 @@ pdf-extractext/
 ├── pyproject.toml              # Configuración del proyecto y dependencias
 └── README.md
 ```
-
 ---
 
-## ⚙️ Configuración (12-Factor App)
-
-Copia `.env.example` a `.env` y completa los valores:
-
-```bash
-cp .env.example .env
-```
-
-> ⚠️ **Nunca subas `.env` al repositorio.** Ya está incluido en `.gitignore`.
-
----
-
-## 🛠️ Instalación y Ejecución
+## Instalación y Ejecución
 
 ### Requisitos previos
 - Python 3.12+
@@ -95,7 +84,7 @@ Documentación interactiva en `http://localhost:8000/docs`
 
 ---
 
-## 🧪 Testing (TDD)
+## Testing (TDD)
 
 Este proyecto aplica **Test Driven Development**. Las pruebas se ejecutan con:
 
@@ -116,7 +105,7 @@ uv run pytest --cov=app
 
 ---
 
-## 🌐 Endpoints de la API
+## Endpoints de la API
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
@@ -128,7 +117,7 @@ uv run pytest --cov=app
 
 ---
 
-## 📐 Principios Aplicados
+## Principios Aplicados
 
 - **12-Factor App** — Configuración por variables de entorno, dependencias explícitas, procesos sin estado
 - **TDD** — Test Driven Development con pytest
@@ -140,7 +129,7 @@ uv run pytest --cov=app
 
 ---
 
-## 📦 Los 12 Factores
+## Los 12 Factores
 
 | Factor | Implementación |
 |--------|----------------|
@@ -159,47 +148,12 @@ uv run pytest --cov=app
 
 ---
 
-## 🤝 Contribución
-
-1. Crear un Issue describiendo la mejora o bug
-2. Crear una rama: `git checkout -b feature/nombre-feature`
-3. Hacer commits descriptivos
-4. Abrir un Pull Request referenciando el Issue
-
----
-
-## 📅 Plazo de Entrega
+## Plazo de Entrega
 
 **23/05/2025** — Etapa N°1
 
 ---
 
-## 📄 Licencia
+## Licencia
 
 MIT © 2026 — Universidad Tecnológica Nacional
-
-<h1>pdf-extractext</h1>
-
-"""<p>
-  Script en Python para extraer texto de archivos PDF y resumirlos con uso de IA (Agente a definir).
-</p>
-
-<h2>Tecnologías</h2>
-<ul>
-  <li><strong>Lenguaje:</strong> Python</li>
-  <li><strong>IA:</strong> Modelo a elegir</li>
-  <li><strong>Base de Datos:</strong> MongoDB</li>
-  <li><strong>Gestor de Paquetes:</strong> UV</li>
-  <li><strong>Librerías de Extracción:</strong> 
-    <ul>
-      <li>pdfplumber</li>
-      <li>PyPDF2 3.0.1</li>
-    </ul>
-  </li>
-</ul>
-
-<h2>Metodologías</h2>
-<ul>
-  <li><strong>TDD:</strong> Test Driven Development</li>
-  <li><strong>12 Factores:</strong> Principios de programación para aplicaciones modernas</li>
-</ul>"""
