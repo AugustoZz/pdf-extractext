@@ -1,8 +1,7 @@
 # extractor package
 # Responsable de la extracción de texto desde archivos PDF.
-#
-# Sub-issue 1B agregará PDFExtractorService y PDFValidationError aquí.
 
 from app.services.extractor.models import ExtractedDocument
+from app.services.extractotr.pdf_extractor import PDFExtractorService, PDFValidationError
 
-__all__ = ["ExtractedDocument"]
+__all__ = ["ExtractedDocument", "PDFExtractorService", "PDFValidationError"]
