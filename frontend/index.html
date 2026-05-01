@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF ExtracText</title>
+    <meta name="description" content="Aplicación web premium para extraer y gestionar texto de documentos PDF">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos Phosphor -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="ph-fill ph-file-pdf"></i>
+                <span>ExtracText</span>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-target="upload-section">
+                    <i class="ph ph-upload-simple"></i>
+                    Extracción
+                </button>
+                <button class="nav-item" data-target="documents-section">
+                    <i class="ph ph-files"></i>
+                    Documentos
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Section -->
+            <section id="upload-section" class="content-section active">
+                <header class="section-header">
+                    <h1>Extraer texto de PDF</h1>
+                    <p>Sube tu archivo PDF y obtén únicamente el texto, guardado de forma segura.</p>
+                </header>
+
+                <div class="upload-container" id="drop-zone">
+                    <div class="upload-icon">
+                        <i class="ph ph-cloud-arrow-up"></i>
+                    </div>
+                    <h2>Arrastra tu archivo PDF aquí</h2>
+                    <p>o haz clic para seleccionar (Máx. 10MB)</p>
+                    <input type="file" id="file-input" accept="application/pdf" hidden>
+                    <button class="btn-primary" onclick="document.getElementById('file-input').click()">
+                        Seleccionar Archivo
+                    </button>
+                </div>
+                
+                <!-- Loading State -->
+                <div class="processing-state hidden" id="upload-processing">
+                    <div class="spinner"></div>
+                    <p>Procesando documento...</p>
+                </div>
+
+                <!-- Result Card -->
+                <div class="result-card hidden" id="upload-result">
+                    <div class="result-header">
+                        <h3>Extracción Exitosa</h3>
+                        <div class="badges">
+                            <span class="badge" id="res-pages">0 páginas</span>
+                        </div>
+                    </div>
+                    <div class="result-body">
+                        <div class="metadata-row">
+                            <strong>Archivo:</strong> <span id="res-filename"></span>
+                        </div>
+                        <div class="metadata-row">
+                            <strong>Checksum:</strong> <span id="res-checksum" class="mono"></span>
+                        </div>
+                        <div class="text-preview-container">
+                            <h4>Vista previa del texto</h4>
+                            <div class="text-preview" id="res-text"></div>
+                        </div>
+                    </div>
+                    <div class="result-actions">
+                        <button class="btn-secondary" onclick="resetUpload()">Subir otro documento</button>
+                        <button class="btn-primary" onclick="goToDocuments()">Ver todos los documentos</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Documents List Section -->
+            <section id="documents-section" class="content-section">
+                <header class="section-header">
+                    <h1>Documentos Persistidos</h1>
+                    <p>Gestiona los documentos de texto extraídos.</p>
+                </header>
+
+                <div class="table-container">
+                    <table class="documents-table">
+                        <thead>
+                            <tr>
+                                <th>Archivo</th>
+                                <th>Páginas</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="documents-tbody">
+                            <!-- Rows injected via JS -->
+                        </tbody>
+                    </table>
+                    <div class="processing-state hidden" id="docs-loading">
+                        <div class="spinner"></div>
+                        <p>Cargando documentos...</p>
+                    </div>
+                    <div class="empty-state hidden" id="docs-empty">
+                        <i class="ph ph-folder-open"></i>
+                        <p>No hay documentos persistidos.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Document Viewer/Editor Modal -->
+    <div class="modal-backdrop hidden" id="doc-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Detalles del Documento</h2>
+                <button class="icon-btn" onclick="closeModal()">
+                    <i class="ph ph-x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre del archivo</label>
+                    <input type="text" id="modal-filename" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Checksum</label>
+                    <input type="text" id="modal-checksum" class="form-input" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Texto Extraído</label>
+                    <textarea id="modal-text" class="form-textarea"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-danger" id="btn-delete-doc">Eliminar</button>
+                <div class="footer-right">
+                    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-primary" id="btn-save-doc">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

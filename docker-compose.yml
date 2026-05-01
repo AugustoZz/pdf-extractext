@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: pdf-extractext-api
+    ports:
+      - "8000:8000"
+    environment:
+      # Sobrescribimos el URI para que apunte al contenedor de MongoDB en lugar de localhost
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_DB_NAME=pdf_extractext
+      - APP_NAME=pdf-extractext
+      - APP_ENV=development
+      - LOG_LEVEL=INFO
+      - MAX_FILE_SIZE_MB=10
+      - PDF_ALLOWED_MIME_TYPE=application/pdf
+    depends_on:
+      mongodb:
+        condition: service_started
+    volumes:
+      # Sincroniza el código fuente para recarga en vivo (hot reload)
+      - .:/app
+    # Reinicia uvicorn en modo watch para el desarrollo
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  mongodb:
+    image: mongo:latest
+    container_name: pdf-extractext-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+
+volumes:
+  mongo_data:

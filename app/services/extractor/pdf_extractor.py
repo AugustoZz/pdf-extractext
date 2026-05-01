@@ -7,6 +7,7 @@ No persiste datos, no genera resúmenes ni interactúa con la API.
 import hashlib
 import io
 import logging
+import re
 
 import pypdf
 from pypdf import PdfReader
@@ -109,7 +110,7 @@ class PDFExtractorService:
             file_bytes: Contenido del PDF como bytes.
 
         Returns:
-            Texto concatenado de todas las páginas, separado por saltos de línea.
+            Texto limpio concatenado de todas las páginas, separado por saltos de línea.
             Retorna string vacío si el PDF no contiene texto seleccionable.
         """
         reader = self._get_reader(file_bytes)
@@ -117,7 +118,49 @@ class PDFExtractorService:
         for page in reader.pages:
             page_text = page.extract_text() or ""
             pages_text.append(page_text)
-        return "\n".join(pages_text).strip()
+        raw = "\n".join(pages_text).strip()
+        return self._clean_text(raw)
+
+    @staticmethod
+    def _clean_text(text: str) -> str:
+        """
+        Limpia y normaliza el texto extraído del PDF preservando su estructura.
+
+        Convierte artefactos de codificación PDF (literales backslash-n,
+        backslashes sueltos) en texto limpio y legible que respeta la
+        estructura original del documento.
+
+        Args:
+            text: Texto crudo extraído por pypdf.
+
+        Returns:
+            Texto limpio con saltos de línea reales preservando la estructura.
+        """
+        # 1. Convertir secuencias LITERALES de escape a caracteres reales.
+        #    Pypdf a veces produce la cadena de dos caracteres \ y n
+        #    como texto plano en vez de un salto de línea real (0x0A).
+        text = text.replace("\\n", "\n")
+        text = text.replace("\\r", "\r")
+        text = text.replace("\\t", "\t")
+
+        # 2. Normalizar CRLF → LF
+        text = text.replace("\r\n", "\n").replace("\r", "\n")
+
+        # 3. Eliminar caracteres de control no imprimibles
+        #    (NUL, BEL, BS, FF, etc.) — se respetan \n (0x0A) y \t (0x09)
+        text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
+
+        # 4. Eliminar TODAS las backslashes sueltas restantes.
+        #    Son artefactos del PDF; el contenido de texto real no las usa.
+        text = text.replace("\\", "")
+
+        # 5. Eliminar espacios/tabs al final de cada línea
+        text = "\n".join(line.rstrip() for line in text.split("\n"))
+
+        # 6. Colapsar más de 2 líneas en blanco consecutivas → máx. 2
+        text = re.sub(r"\n{3,}", "\n\n", text)
+
+        return text.strip()
 
     def extract_metadata(self, file_bytes: bytes) -> dict:
         """

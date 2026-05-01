@@ -62,7 +62,7 @@ pdf-extractext/
 - Python 3.12+
 - [uv](https://github.com/astral-sh/uv) instalado
 
-### Pasos
+### Pasos (Opción 1: Local con uv)
 
 ```bash
 # 1. Clonar el repositorio
@@ -70,17 +70,32 @@ git clone https://github.com/AugustoZz/pdf-extractext.git
 cd pdf-extractext
 
 # 2. Crear entorno virtual e instalar dependencias
-uv sync
+uv venv
+uv pip install -r requirements.txt
 
 # 3. Configurar variables de entorno
 cp .env.example .env
 
 # 4. Ejecutar la aplicación
-uv run uvicorn app.main:app --reload
+uv run python main.py
 ```
 
 La API estará disponible en `http://localhost:8000`
 Documentación interactiva en `http://localhost:8000/docs`
+
+### Pasos (Opción 2: Usando Docker - ¡Recomendado!)
+
+Para evaluar el proyecto sin instalar Python o MongoDB localmente:
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/AugustoZz/pdf-extractext.git
+cd pdf-extractext
+
+# 2. Levantar la base de datos y la API
+docker compose up --build
+```
+La API estará lista y conectada a la base de datos automáticamente en `http://localhost:8000`.
 
 ---
 
@@ -134,10 +149,10 @@ uv run pytest --cov=app
 | Factor | Implementación |
 |--------|----------------|
 | **I. Codebase** | Un repositorio Git, múltiples deploys |
-| **II. Dependencies** | `pyproject.toml` + `uv` — dependencias declaradas explícitamente |
+| **II. Dependencies** | `requirements.txt` + `uv` — dependencias declaradas explícitamente |
 | **III. Config** | Variables de entorno vía `.env` (nunca en código) |
 | **IV. Backing Services** | MongoDB como recurso adjunto configurable |
-| **V. Build/Release/Run** | Separación clara de etapas |
+| **V. Build/Release/Run** | Separación clara usando Docker y Docker Compose |
 | **VI. Processes** | La app es stateless — no guarda estado entre requests |
 | **VII. Port Binding** | FastAPI expone el servicio vía puerto configurable |
 | **VIII. Concurrency** | Escalable horizontalmente con workers uvicorn |
