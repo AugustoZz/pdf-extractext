@@ -1,17 +1,50 @@
 """
 Repositorio para operar con la colección de documentos en MongoDB.
 """
+import logging
 from typing import List, Optional
+
 from bson import ObjectId
+from pymongo.errors import PyMongoError
+
 from app.infrastructure.database.connection import get_database
+
+logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "documents"
 
+# Campos derivados del archivo original: no se pueden modificar vía API.
+# Reescribir el checksum rompería la detección de duplicados.
+IMMUTABLE_FIELDS = ("_id", "id", "checksum")
+
 class DocumentRepository:
-    
+
     @classmethod
     def _collection(cls):
         return get_database()[COLLECTION_NAME]
+
+    @classmethod
+    async def ensure_indexes(cls) -> None:
+        """
+        Crea los índices necesarios en la colección.
+
+        El índice único sobre ``checksum`` es lo que realmente impide documentos
+        duplicados: la verificación previa en el endpoint no alcanza, porque dos
+        subidas simultáneas del mismo PDF pueden pasar el chequeo antes de que
+        cualquiera de las dos inserte.
+        """
+        try:
+            await cls._collection().create_index("checksum", unique=True, name="uq_checksum")
+            logger.info("Índice único sobre 'checksum' verificado.")
+        except PyMongoError as exc:
+            # No abortamos el arranque: lo más probable es que ya existan
+            # documentos duplicados de antes de introducir el índice.
+            logger.error(
+                "No se pudo crear el índice único sobre 'checksum': %s. "
+                "Es probable que existan duplicados previos en la colección; "
+                "limpialos y reiniciá la aplicación.",
+                exc,
+            )
 
     @classmethod
     async def get_by_checksum(cls, checksum: str) -> Optional[dict]:
@@ -49,17 +82,31 @@ class DocumentRepository:
 
     @classmethod
     async def update(cls, doc_id: str, data: dict) -> Optional[dict]:
-        """Actualiza parcialmente un documento."""
+        """
+        Actualiza parcialmente un documento.
+
+        Args:
+            doc_id: ID del documento a actualizar.
+            data: Campos a modificar. Los campos inmutables se descartan.
+
+        Returns:
+            El documento actualizado, o None si el ID no existe / no es válido.
+        """
         if not ObjectId.is_valid(doc_id):
             return None
-        # Removemos _id y id si vienen en la data
-        data.pop("_id", None)
-        data.pop("id", None)
-        
+
+        # Copia: no mutamos el diccionario que nos pasó el llamador.
+        changes = {key: value for key, value in data.items() if key not in IMMUTABLE_FIELDS}
+
+        # Sin campos válidos no hay nada que actualizar. Mongo rechaza un
+        # "$set" vacío, así que devolvemos el documento tal cual está.
+        if not changes:
+            return await cls.get_by_id(doc_id)
+
         result = await cls._collection().update_one(
-            {"_id": ObjectId(doc_id)}, {"$set": data}
+            {"_id": ObjectId(doc_id)}, {"$set": changes}
         )
-        if result.modified_count == 0 and result.matched_count == 0:
+        if result.matched_count == 0:
             return None
         return await cls.get_by_id(doc_id)
 

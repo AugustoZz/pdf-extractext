@@ -172,32 +172,39 @@ async function loadDocuments() {
 
         docs.forEach(doc => {
             const tr = document.createElement('tr');
-            const date = new Date(doc.created_at).toLocaleDateString('es-ES', {
-                year: 'numeric', month: 'short', day: 'numeric',
-                hour: '2-digit', minute:'2-digit'
-            });
-            
+            const date = formatDate(doc.created_at);
+
             // Handle different ID formats (MongoDB uses _id as ObjectId string usually, but pydantic parses it to id or _id depending on config)
             const docId = doc.id || doc._id;
 
+            // Los valores provenientes del servidor se escapan: el nombre del
+            // archivo lo elige quien sube el PDF y no es contenido confiable.
             tr.innerHTML = `
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <i class="ph-fill ph-file-pdf" style="color:var(--danger)"></i>
-                        ${doc.filename}
+                        ${escapeHtml(doc.filename)}
                     </div>
                 </td>
-                <td>${doc.page_count}</td>
-                <td style="color:var(--text-secondary)">${date}</td>
+                <td>${escapeHtml(doc.page_count)}</td>
+                <td style="color:var(--text-secondary)">${escapeHtml(date)}</td>
                 <td>
-                    <button class="icon-btn" onclick="openDocument('${docId}')" title="Ver/Editar">
+                    <button class="icon-btn" data-action="edit" title="Ver/Editar">
                         <i class="ph ph-pencil-simple"></i>
                     </button>
-                    <button class="icon-btn" onclick="deleteDocumentFromTable('${docId}')" title="Eliminar">
+                    <button class="icon-btn" data-action="delete" title="Eliminar">
                         <i class="ph ph-trash" style="color:var(--danger)"></i>
                     </button>
                 </td>
             `;
+
+            // Listeners programáticos en lugar de onclick inline: el id nunca
+            // se interpola dentro de código JS.
+            tr.querySelector('[data-action="edit"]')
+                .addEventListener('click', () => openDocument(docId));
+            tr.querySelector('[data-action="delete"]')
+                .addEventListener('click', () => deleteDocumentFromTable(docId));
+
             tbody.appendChild(tr);
         });
 
@@ -280,17 +287,44 @@ async function deleteDocument(id) {
 }
 
 // Utilities
+
+/**
+ * Escapa caracteres especiales de HTML.
+ * Obligatorio para cualquier dato que venga del servidor (nombre de archivo,
+ * mensajes de error) antes de insertarlo con innerHTML: evita XSS almacenado
+ * a través de un PDF subido con un nombre malicioso.
+ */
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/** Formatea una fecha ISO del servidor; devuelve '—' si falta o es inválida. */
+function formatDate(isoString) {
+    if (!isoString) return '—';
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return '—';
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+}
+
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
-    const icon = type === 'success' ? 'ph-check-circle' : 
+
+    const icon = type === 'success' ? 'ph-check-circle' :
                  type === 'error' ? 'ph-warning-circle' : 'ph-info';
-                 
+
     toast.innerHTML = `
         <i class="ph-fill ${icon}" style="font-size:24px"></i>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
     `;
     
     container.appendChild(toast);

@@ -1,9 +1,9 @@
 """
 Endpoints CRUD para documentos persistidos en la base de datos.
 """
-from fastapi import APIRouter, HTTPException
-from typing import List, Dict, Any
+from fastapi import APIRouter, HTTPException, Query
 
+from app.api.v1.schemas import DocumentUpdate
 from app.infrastructure.database.repository import DocumentRepository
 
 router = APIRouter()
@@ -13,7 +13,10 @@ router = APIRouter()
     summary="Listar documentos",
     response_description="Lista paginada de documentos extraídos."
 )
-async def list_documents(skip: int = 0, limit: int = 100):
+async def list_documents(
+    skip: int = Query(default=0, ge=0, description="Documentos a omitir."),
+    limit: int = Query(default=100, ge=1, le=500, description="Máximo de documentos a devolver."),
+):
     """Devuelve todos los documentos guardados en la BD."""
     docs = await DocumentRepository.get_all(skip=skip, limit=limit)
     return {"data": docs}
@@ -35,14 +38,21 @@ async def get_document(doc_id: str):
     summary="Actualizar un documento",
     response_description="El documento actualizado."
 )
-async def update_document(doc_id: str, data: Dict[str, Any]):
+async def update_document(doc_id: str, data: DocumentUpdate):
     """
     Actualiza parcialmente los campos de un documento.
     (Ej: actualizar metadatos o corregir alguna extracción manual).
     """
-    doc = await DocumentRepository.update(doc_id, data)
+    changes = data.to_changes()
+    if not changes:
+        raise HTTPException(
+            status_code=400,
+            detail="Debe enviarse al menos un campo para actualizar.",
+        )
+
+    doc = await DocumentRepository.update(doc_id, changes)
     if not doc:
-        raise HTTPException(status_code=404, detail="Documento no encontrado o sin cambios")
+        raise HTTPException(status_code=404, detail="Documento no encontrado")
     return doc
 
 @router.delete(

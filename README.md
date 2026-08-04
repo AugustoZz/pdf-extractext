@@ -19,11 +19,11 @@
 
 | Tecnología | Uso |
 |---|---|
-| **Python 3.12+** | Lenguaje principal |
+| **Python 3.11+** | Lenguaje principal |
 | **FastAPI** | Framework web / API REST |
 | **uv** | Gestor de paquetes y entornos virtuales |
-| **MongoDB** | Base de datos no relacional |
-| **pdfplumber** | Extracción de texto desde PDFs |
+| **MongoDB** | Base de datos no relacional (driver asíncrono `motor`) |
+| **pypdf** | Extracción de texto y metadatos desde PDFs |
 | **pytest** | Testing (TDD) |
 
 ---
@@ -45,13 +45,17 @@ pdf-extractext/
 │   └── services/               # Lógica de negocio
 │       └── extractor/          # Servicio de extracción de texto PDF
 │
+├── frontend/                   # Cliente web estático (servido en /web)
+│
 ├── tests/                      # Suite de pruebas (TDD)
 │   ├── unit/                   # Pruebas unitarias
 │   └── integration/            # Pruebas de integración
 │
 ├── docs/                       # Documentación del proyecto
 ├── .env.example                # Variables de entorno requeridas (12-Factor)
-├── pyproject.toml              # Configuración del proyecto y dependencias
+├── requirements.txt            # Dependencias del proyecto
+├── Dockerfile                  # Imagen de la aplicación
+├── docker-compose.yml          # Orquestación API + MongoDB
 └── README.md
 ```
 ---
@@ -59,8 +63,9 @@ pdf-extractext/
 ## Instalación y Ejecución
 
 ### Requisitos previos
-- Python 3.12+
+- Python 3.11+
 - [uv](https://github.com/astral-sh/uv) instalado
+- MongoDB en ejecución (o usar la Opción 2 con Docker)
 
 ### Pasos (Opción 1: Local con uv)
 
@@ -108,15 +113,21 @@ uv run pytest
 ```
 
 ```bash
-# Solo pruebas unitarias
+# Solo pruebas unitarias (no requieren MongoDB)
 uv run pytest tests/unit/
 
-# Solo pruebas de integración
+# Solo pruebas de integración (requieren MongoDB levantado)
 uv run pytest tests/integration/
 
 # Con cobertura
 uv run pytest --cov=app
 ```
+
+> **Base de datos de test.** Las pruebas de integración borran la colección
+> `documents` antes y después de cada test. Por eso se conectan a una base
+> **separada**, definida en `MONGODB_TEST_DB_NAME` (por defecto
+> `pdf_extractext_test`), y verifican que sea distinta de `MONGODB_DB_NAME`
+> antes de tocar nada.
 
 ---
 
@@ -124,11 +135,20 @@ uv run pytest --cov=app
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| `POST` | `/api/v1/documents/` | Subir y extraer texto de un PDF |
-| `GET` | `/api/v1/documents/` | Listar todos los documentos |
+| `POST` | `/api/v1/extract` | Subir un PDF, extraer su texto y persistirlo |
+| `GET` | `/api/v1/documents` | Listar documentos (paginado con `skip` y `limit`) |
 | `GET` | `/api/v1/documents/{id}` | Obtener documento por ID |
-| `PUT` | `/api/v1/documents/{id}` | Actualizar documento |
+| `PUT` | `/api/v1/documents/{id}` | Actualizar documento (`filename`, `text`, `metadata`) |
 | `DELETE` | `/api/v1/documents/{id}` | Eliminar documento |
+
+Códigos de respuesta relevantes de `POST /api/v1/extract`:
+
+| Código | Significado |
+|--------|-------------|
+| `201` | Documento extraído y guardado |
+| `400` | El archivo no tiene extensión `.pdf` |
+| `409` | Ya existe un documento con el mismo checksum |
+| `422` | El PDF es inválido, está corrupto o supera `MAX_FILE_SIZE_MB` |
 
 ---
 

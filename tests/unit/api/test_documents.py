@@ -42,3 +42,41 @@ def test_update_document_success(mock_repo):
     response = client.put("/api/v1/documents/12345", json={"text": "Actualizado"})
     assert response.status_code == 200
     assert response.json() == mock_doc
+
+
+def test_update_document_empty_body_returns_400(mock_repo):
+    """Un body sin campos debe dar 400, no un error 500 desde Mongo."""
+    mock_repo.update = AsyncMock()
+    response = client.put("/api/v1/documents/12345", json={})
+    assert response.status_code == 400
+    mock_repo.update.assert_not_called()
+
+
+def test_update_document_rejects_unknown_field(mock_repo):
+    """Campos no declarados en el esquema se rechazan (extra='forbid')."""
+    mock_repo.update = AsyncMock()
+    response = client.put("/api/v1/documents/12345", json={"borrar_todo": True})
+    assert response.status_code == 422
+    mock_repo.update.assert_not_called()
+
+
+def test_update_document_cannot_overwrite_checksum(mock_repo):
+    """El checksum deriva del archivo: no es un campo editable vía API."""
+    mock_repo.update = AsyncMock()
+    response = client.put("/api/v1/documents/12345", json={"checksum": "falsificado"})
+    assert response.status_code == 422
+    mock_repo.update.assert_not_called()
+
+
+def test_update_document_not_found(mock_repo):
+    mock_repo.update = AsyncMock(return_value=None)
+    response = client.put("/api/v1/documents/12345", json={"text": "Actualizado"})
+    assert response.status_code == 404
+
+
+def test_list_documents_rejects_invalid_pagination(mock_repo):
+    mock_repo.get_all = AsyncMock()
+    assert client.get("/api/v1/documents?skip=-1").status_code == 422
+    assert client.get("/api/v1/documents?limit=0").status_code == 422
+    assert client.get("/api/v1/documents?limit=9999").status_code == 422
+    mock_repo.get_all.assert_not_called()
