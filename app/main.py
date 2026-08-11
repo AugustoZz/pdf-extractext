@@ -8,6 +8,8 @@ Levantar con:
 """
 import logging
 import sys
+from contextlib import asynccontextmanager
+from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
@@ -16,22 +18,28 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
 from app.api.v1 import router as v1_router
+from app.core.config import settings
+from app.infrastructure.database.connection import connect_to_mongo, close_mongo_connection
+from app.infrastructure.database.repository import DocumentRepository
 
 # ── Logging ───────────────────────────────────────────────────────
+# El nivel sale de la configuración (12-Factor III), no hardcodeado.
 logging.basicConfig(
-    level=logging.INFO,
+    level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
     format="%(asctime)s [%(levelname)s] %(name)s — %(message)s",
     stream=sys.stdout,
 )
 logger = logging.getLogger(__name__)
 
-from contextlib import asynccontextmanager
-from app.infrastructure.database.connection import connect_to_mongo, close_mongo_connection
+# Ruta absoluta al frontend: no depende del directorio desde el que se arranque.
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     await connect_to_mongo()
+    await DocumentRepository.ensure_indexes()
     yield
     # Shutdown
     await close_mongo_connection()
@@ -44,10 +52,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Permitir peticiones desde cualquier origen (útil en desarrollo)
+# CORS: abierto en desarrollo, restringido a los orígenes declarados en
+# producción. Un "*" en producción permitiría a cualquier sitio consumir la API.
+if settings.is_production and settings.cors_origins == ["*"]:
+    logger.warning(
+        "APP_ENV=production con CORS_ALLOW_ORIGINS='*': se bloquean todos los "
+        "orígenes cruzados. Declará los dominios permitidos en CORS_ALLOW_ORIGINS."
+    )
+    allowed_origins = []
+else:
+    allowed_origins = settings.cors_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -62,14 +80,19 @@ def root():
     return RedirectResponse(url="/web/index.html")
 
 # Montar frontend estático
-app.mount("/web", StaticFiles(directory="frontend"), name="frontend")
+app.mount("/web", StaticFiles(directory=FRONTEND_DIR), name="frontend")
 
 
 # ── Punto de entrada ──────────────────────────────────────────────
 def main() -> None:
     """Inicia uvicorn programáticamente (usado por root main.py)."""
-    logger.info("Iniciando pdf-extractext en http://localhost:8000")
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    logger.info("Iniciando %s en http://localhost:%d", settings.APP_NAME, settings.PORT)
+    uvicorn.run(
+        "app.main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=not settings.is_production,
+    )
 
 
 if __name__ == "__main__":

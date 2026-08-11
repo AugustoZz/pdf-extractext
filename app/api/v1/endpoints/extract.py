@@ -3,16 +3,22 @@ Endpoint de extracción de texto desde PDF.
 
 POST /api/v1/extract → JSON con texto, metadatos, checksum y páginas.
 """
-from fastapi import APIRouter, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
-
-from app.services.extractor import PDFExtractorService, PDFValidationError
-
-from app.infrastructure.database.repository import DocumentRepository
 from datetime import datetime, timezone
 
+from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi.responses import JSONResponse
+from pymongo.errors import DuplicateKeyError
+
+from app.core.config import settings
+from app.infrastructure.database.repository import DocumentRepository
+from app.services.extractor import PDFExtractorService, PDFValidationError
+
 router = APIRouter()
-_service = PDFExtractorService(max_file_size_mb=10)
+_service = PDFExtractorService(max_file_size_mb=settings.MAX_FILE_SIZE_MB)
+
+# No se incluye el nombre del archivo: es un dato que elige quien sube el PDF
+# y no tiene sentido devolverlo tal cual en un mensaje de error.
+_DUPLICATE_DETAIL = "El documento ya existe en la base de datos (checksum duplicado)."
 
 
 def _validate_upload(file: UploadFile) -> None:
@@ -38,17 +44,15 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
     """
     _validate_upload(file)
     file_bytes = await file.read()
-    
+
     # 1. Calcular el checksum antes de extraer para evitar proceso innecesario si ya existe
     checksum = _service.calculate_checksum(file_bytes)
-    
-    # 2. Verificar duplicado en la BD
+
+    # 2. Verificar duplicado en la BD (atajo: evita extraer texto en vano).
+    #    La garantía real la da el índice único sobre 'checksum'; ver paso 4.
     existing_doc = await DocumentRepository.get_by_checksum(checksum)
     if existing_doc:
-        raise HTTPException(
-            status_code=409, 
-            detail=f"El documento '{file.filename}' ya existe en la base de datos (Checksum duplicado)."
-        )
+        raise HTTPException(status_code=409, detail=_DUPLICATE_DETAIL)
 
     # 3. Procesar y extraer texto
     try:
@@ -65,7 +69,11 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
         "text": doc.text,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
-    
-    saved_doc = await DocumentRepository.create(data_to_insert)
+
+    try:
+        saved_doc = await DocumentRepository.create(data_to_insert)
+    except DuplicateKeyError as exc:
+        # Otra petición insertó el mismo PDF entre el paso 2 y este insert.
+        raise HTTPException(status_code=409, detail=_DUPLICATE_DETAIL) from exc
 
     return JSONResponse(status_code=201, content=saved_doc)
