@@ -136,7 +136,7 @@ uv run pytest --cov=app
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | `POST` | `/api/v1/extract` | Subir un PDF, extraer su texto y persistirlo |
-| `GET` | `/api/v1/documents` | Listar documentos (paginado con `skip` y `limit`) |
+| `GET` | `/api/v1/documents` | Listar documentos, del más reciente al más antiguo (paginado con `skip` y `limit`). **No incluye el campo `text`** |
 | `GET` | `/api/v1/documents/{id}` | Obtener documento por ID |
 | `PUT` | `/api/v1/documents/{id}` | Actualizar documento (`filename`, `text`, `metadata`) |
 | `DELETE` | `/api/v1/documents/{id}` | Eliminar documento |
@@ -148,6 +148,7 @@ Códigos de respuesta relevantes de `POST /api/v1/extract`:
 | `201` | Documento extraído y guardado |
 | `400` | El archivo no tiene extensión `.pdf` |
 | `409` | Ya existe un documento con el mismo checksum |
+| `415` | El cliente declaró un `content-type` distinto de `application/pdf` |
 | `422` | El PDF es inválido, está corrupto o supera `MAX_FILE_SIZE_MB` |
 
 ---

@@ -147,3 +147,32 @@ async def test_update_does_not_mutate_caller_dict():
 async def test_update_nonexistent_document_returns_none():
     doc = await DocumentRepository.update("507f1f77bcf86cd799439011", {"text": "x"})
     assert doc is None
+
+
+@pytest.mark.asyncio
+async def test_get_all_excludes_text_field():
+    """El listado no debe arrastrar el texto completo de cada documento."""
+    await DocumentRepository.create(
+        {"text": "Texto muy largo", "checksum": "checksum-listado", "page_count": 1}
+    )
+
+    docs = await DocumentRepository.get_all()
+
+    assert len(docs) == 1
+    assert "text" not in docs[0]
+    assert docs[0]["checksum"] == "checksum-listado"
+
+
+@pytest.mark.asyncio
+async def test_get_all_orders_by_created_at_desc():
+    """El más reciente va primero."""
+    await DocumentRepository.create(
+        {"checksum": "viejo", "created_at": "2026-01-01T00:00:00+00:00"}
+    )
+    await DocumentRepository.create(
+        {"checksum": "nuevo", "created_at": "2026-08-01T00:00:00+00:00"}
+    )
+
+    docs = await DocumentRepository.get_all()
+
+    assert [d["checksum"] for d in docs] == ["nuevo", "viejo"]

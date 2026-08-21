@@ -21,10 +21,25 @@ _service = PDFExtractorService(max_file_size_mb=settings.MAX_FILE_SIZE_MB)
 _DUPLICATE_DETAIL = "El documento ya existe en la base de datos (checksum duplicado)."
 
 
+# Tipos que usan los clientes que no declaran un MIME real (curl, algunos SDK).
+# No se rechazan: la validación que vale es la firma %PDF del contenido.
+_GENERIC_MIME_TYPES = frozenset({"", "application/octet-stream", "binary/octet-stream"})
+
+
 def _validate_upload(file: UploadFile) -> None:
-    """Valida que el archivo subido tenga extensión .pdf."""
+    """Valida la extensión y, si el cliente lo declara, el content-type."""
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="El archivo debe tener extensión .pdf")
+
+    declared_type = (file.content_type or "").lower()
+    if (
+        declared_type not in _GENERIC_MIME_TYPES
+        and declared_type != settings.PDF_ALLOWED_MIME_TYPE
+    ):
+        raise HTTPException(
+            status_code=415,
+            detail=f"El content-type declarado debe ser {settings.PDF_ALLOWED_MIME_TYPE}.",
+        )
 
 
 @router.post(

@@ -83,3 +83,30 @@ def test_extract_pdf_rejects_non_pdf_extension():
         files={"file": ("malicioso.exe", b"MZ\x90\x00", "application/pdf")}
     )
     assert response.status_code == 400
+
+def test_extract_pdf_rejects_wrong_content_type():
+    """Un content-type declarado explícitamente distinto de PDF se rechaza."""
+    response = client.post(
+        "/api/v1/extract",
+        files={"file": ("test.pdf", b"%PDF-1.4...", "text/html")}
+    )
+    assert response.status_code == 415
+
+def test_extract_pdf_accepts_generic_content_type(mock_repo, mock_service):
+    """
+    Los clientes de línea de comandos suelen mandar octet-stream: no se rechaza,
+    porque la validación real es la firma %PDF del contenido.
+    """
+    mock_service.calculate_checksum.return_value = "genericmime"
+    mock_repo.get_by_checksum = AsyncMock(return_value=None)
+    mock_service.extract.return_value = ExtractedDocument(
+        text="Texto", checksum="genericmime", page_count=1, metadata={}
+    )
+    mock_repo.create = AsyncMock(return_value={"id": "abc", "checksum": "genericmime"})
+
+    response = client.post(
+        "/api/v1/extract",
+        files={"file": ("test.pdf", b"%PDF-1.4...", "application/octet-stream")}
+    )
+
+    assert response.status_code == 201

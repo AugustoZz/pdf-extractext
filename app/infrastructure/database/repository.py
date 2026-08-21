@@ -5,6 +5,7 @@ import logging
 from typing import List, Optional
 
 from bson import ObjectId
+from pymongo import DESCENDING
 from pymongo.errors import PyMongoError
 
 from app.infrastructure.database.connection import get_database
@@ -16,6 +17,10 @@ COLLECTION_NAME = "documents"
 # Campos derivados del archivo original: no se pueden modificar vía API.
 # Reescribir el checksum rompería la detección de duplicados.
 IMMUTABLE_FIELDS = ("_id", "id", "checksum")
+
+# El listado no necesita el texto extraído; excluirlo evita respuestas de
+# varios MB cuando hay muchos documentos.
+LIST_PROJECTION = {"text": 0}
 
 class DocumentRepository:
 
@@ -33,6 +38,8 @@ class DocumentRepository:
         subidas simultáneas del mismo PDF pueden pasar el chequeo antes de que
         cualquiera de las dos inserte.
         """
+        # Cada índice va en su propio try: que falle el único no debe impedir
+        # que se cree el de fecha.
         try:
             await cls._collection().create_index("checksum", unique=True, name="uq_checksum")
             logger.info("Índice único sobre 'checksum' verificado.")
@@ -45,6 +52,15 @@ class DocumentRepository:
                 "limpialos y reiniciá la aplicación.",
                 exc,
             )
+
+        # Soporta el orden por fecha del listado sin recorrer la colección.
+        try:
+            await cls._collection().create_index(
+                [("created_at", DESCENDING)], name="ix_created_at"
+            )
+            logger.info("Índice sobre 'created_at' verificado.")
+        except PyMongoError as exc:
+            logger.error("No se pudo crear el índice sobre 'created_at': %s", exc)
 
     @classmethod
     async def get_by_checksum(cls, checksum: str) -> Optional[dict]:
@@ -72,8 +88,20 @@ class DocumentRepository:
 
     @classmethod
     async def get_all(cls, skip: int = 0, limit: int = 100) -> List[dict]:
-        """Devuelve una lista paginada de documentos."""
-        cursor = cls._collection().find().skip(skip).limit(limit)
+        """
+        Devuelve una lista paginada de documentos, del más reciente al más antiguo.
+
+        El campo ``text`` se excluye a propósito: la vista de listado no lo
+        muestra y devolverlo multiplica el peso de la respuesta por cada
+        documento. Para obtener el texto completo, usar ``get_by_id``.
+        """
+        cursor = (
+            cls._collection()
+            .find({}, LIST_PROJECTION)
+            .sort("created_at", DESCENDING)
+            .skip(skip)
+            .limit(limit)
+        )
         docs = []
         async for doc in cursor:
             doc["id"] = str(doc.pop("_id"))
