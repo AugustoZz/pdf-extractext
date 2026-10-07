@@ -8,18 +8,27 @@
 
 ### Respuesta exitosa: 200
 {
-  "text": "...",
-  "page_count": ?,
+  "text": "Texto extraído exitosamente",
+  "page_count": int,
   "metadata": { ... }
 }
+
+- `text`: puede ser "" (PDF escaneado sin texto seleccionable)
+- `page count`: entero, mayor o igual a 1
+- `metadata`: objeto; claves en minúsculas; puede ser {}
+
 
 ### Errores
 | Situación                        | Código | Cuerpo         |
 |----------------------------------|--------|----------------|
-| Sin firma %PDF                   |  422   | {"detail": …}  |
-| PDF corrupto                     |  422   | {"detail": …}  |
-| Supera el tamaño máximo          |  422   | {"detail": …}  |
+| Sin firma %PDF                   |  422   | {"detail": "mensaje en texto"}  |
+| PDF corrupto                     |  422   | {"detail": "mensaje en texto"}  |
+| Supera el tamaño máximo          |  422   | {"detail": "mensaje en texto}  |
 | Falta el campo `file`            |  422   | (lo genera FastAPI) |
+
+## Validaciones
+- El extractor valida el contenido: tamaño, firma %PDF e integridad
+- La extensión .pdf y el content-type los valida quen llama
 
 ## GET /health
 200 {"status": "ok"}
