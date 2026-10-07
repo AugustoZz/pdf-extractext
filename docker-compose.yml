@@ -25,6 +25,13 @@ services:
       - .:/app
     # Reinicia uvicorn en modo watch para el desarrollo
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    deploy:
+      resources:
+        # El TP pide límites explícitos en cada contenedor. La api no participa de
+        # las pruebas de carga: con poco le alcanza y le deja CPU al extractor.
+        limits:
+          cpus: "0.5"
+          memory: 512M
     restart: unless-stopped
 
   mongodb:
@@ -34,6 +41,12 @@ services:
       - "${MONGO_PORT:-27017}:27017"
     volumes:
       - mongo_data:/data/db
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          # mongod ajusta su caché al límite del contenedor.
+          memory: 1G
     restart: always
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
@@ -88,6 +101,8 @@ services:
 
   # ── Pruebas de carga ────────────────────────────────────────────
   # Perfil "stress": no arrancan con `docker compose up`, se corren a pedido.
+  # Sin límites a propósito: son el generador de carga, no el sistema medido, y
+  # limitarlos falsearía las mediciones.
   k6:
     image: grafana/k6:2.3.0
     profiles: ["stress"]
