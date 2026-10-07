@@ -16,10 +16,10 @@
 ### Errores
 | Situación                        | Código | Cuerpo         |
 |----------------------------------|--------|----------------|
-| Sin firma %PDF                   |  ???   | {"detail": …}  |
-| PDF corrupto                     |  ???   | {"detail": …}  |
-| Supera el tamaño máximo          |  ???   | {"detail": …}  |
-| Falta el campo `file`            |  ???   | (lo genera FastAPI) |
+| Sin firma %PDF                   |  422   | {"detail": …}  |
+| PDF corrupto                     |  422   | {"detail": …}  |
+| Supera el tamaño máximo          |  422   | {"detail": …}  |
+| Falta el campo `file`            |  422   | (lo genera FastAPI) |
 
 ## GET /health
 200 {"status": "ok"}
