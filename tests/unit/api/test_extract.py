@@ -60,8 +60,8 @@ def test_extract_pdf_success_saves_to_db(mock_repo, mock_service, mock_checksum)
     assert response.status_code == 201
     assert response.json()["id"] == "new123"
     assert response.json()["checksum"] == "newchecksum123"
-    inserted=mock_repo.create.call_args[0]
-    assert inserted["checksum"] == "newchecksum123"
+    inserted=mock_repo.create.call_args[0][0]
+    assert inserted[0]["checksum"] == "newchecksum123"
 
 def test_extract_pdf_concurrent_duplicate_returns_409(mock_repo, mock_service, mock_checksum):
     """
