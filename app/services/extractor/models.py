@@ -17,9 +17,6 @@ class ExtractedDocument:
             concatenado y separado por saltos de línea. Puede ser
             vacío si el PDF no contiene texto seleccionable
             (por ejemplo, un PDF escaneado sin OCR).
-        checksum (str): Hash SHA-256 del archivo original en formato
-            hexadecimal (64 caracteres). Usado para detectar
-            documentos duplicados en la base de datos.
         page_count (int): Número total de páginas del PDF.
         metadata (dict): Metadatos del PDF (autor, título, fecha de
             creación, etc.). Las claves están en minúsculas y sin el
@@ -28,6 +25,5 @@ class ExtractedDocument:
     """
 
     text: str
-    checksum: str
     page_count: int
     metadata: dict = field(default_factory=dict)

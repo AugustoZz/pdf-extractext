@@ -46,30 +46,6 @@ class TestValidatePDF:
         with pytest.raises(PDFValidationError):
             service.validate_pdf(b"PK\x03\x04")  # ZIP signature, not PDF
 
-
-# ── Tests de checksum ─────────────────────────────────────────────────────────
-class TestCalculateChecksum:
-    def test_calculate_checksum_deterministic(self, service, sample_pdf_bytes):
-        """El mismo archivo debe producir siempre el mismo checksum."""
-        checksum1 = service.calculate_checksum(sample_pdf_bytes)
-        checksum2 = service.calculate_checksum(sample_pdf_bytes)
-        assert checksum1 == checksum2
-
-    def test_calculate_checksum_different_files(
-        self, service, sample_pdf_bytes, empty_pdf_bytes
-    ):
-        """Archivos distintos deben producir checksums distintos."""
-        checksum1 = service.calculate_checksum(sample_pdf_bytes)
-        checksum2 = service.calculate_checksum(empty_pdf_bytes)
-        assert checksum1 != checksum2
-
-    def test_calculate_checksum_is_sha256(self, service, sample_pdf_bytes):
-        """El checksum debe ser un hash SHA-256 (64 caracteres hexadecimales)."""
-        checksum = service.calculate_checksum(sample_pdf_bytes)
-        assert len(checksum) == 64
-        assert all(c in "0123456789abcdef" for c in checksum)
-
-
 # ── Tests de extracción de texto ──────────────────────────────────────────────
 class TestExtractText:
     def test_extract_text_from_valid_pdf(self, service, sample_pdf_bytes):
