@@ -132,6 +132,27 @@ uv run pytest --cov=app
 
 ---
 
+## Pruebas de carga y estrés
+
+El extractor-service se mide con los perfiles del TP de carga, usando **k6** (spike de
+100 VUs) y **Vegeta** (carga fija de 50 req/s). Ambos corren en Docker, así que no hace
+falta instalarlos. Desde el host, el extractor responde en `http://localhost:8080/extract`
+(5 réplicas detrás de nginx).
+
+```bash
+# Con el sistema levantado (docker compose up --build -d)
+docker compose run --rm --service-ports k6
+docker compose run --rm vegeta
+```
+
+Los resultados quedan en `tests/stress/results/`.
+
+- Cómo correrlas, perfiles y opciones: [`tests/stress/README.md`](tests/stress/README.md)
+- Arquitectura, mediciones y proceso de optimización: [`docs/informe-carga.md`](docs/informe-carga.md)
+- Contrato del extractor: [`docs/extractor_contract.md`](docs/extractor_contract.md)
+
+---
+
 ## Endpoints de la API
 
 | Método | Ruta | Descripción |
