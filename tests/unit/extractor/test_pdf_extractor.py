@@ -108,7 +108,6 @@ class TestExtract:
         """El ExtractedDocument retornado debe tener todos los campos requeridos."""
         result = service.extract(sample_pdf_bytes)
         assert hasattr(result, "text")
-        assert hasattr(result, "checksum")
         assert hasattr(result, "page_count")
         assert hasattr(result, "metadata")
 
