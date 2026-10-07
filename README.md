@@ -101,6 +101,7 @@ cd pdf-extractext
 docker compose up --build
 ```
 La API estará lista y conectada a la base de datos automáticamente en `http://localhost:8000`.
+Si algún puerto ya está en uso en tu máquina, cambialo en `.env` (ver la sección Docker Compose de `.env.example`).
 
 ---
 

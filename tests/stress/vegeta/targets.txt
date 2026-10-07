@@ -1,0 +1,15 @@
+POST http://extractor-lb/extract
+Content-Type: application/pdf
+@/stress/pdfs/2020-Scrum-Guide-Spanish-Latin-South-American.pdf
+
+POST http://extractor-lb/extract
+Content-Type: application/pdf
+@/stress/pdfs/Essential-Kanban-Condensed-Spanish.pdf
+
+POST http://extractor-lb/extract
+Content-Type: application/pdf
+@/stress/pdfs/Filosofia Lean.pdf
+
+POST http://extractor-lb/extract
+Content-Type: application/pdf
+@/stress/pdfs/scrum_manager_historias_usuario.pdf
