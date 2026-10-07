@@ -8,12 +8,21 @@ cliente (k6 / Vegeta) ──► extractor-lb (nginx, least_conn) ──► extra
 
 - **extractor-lb:** reparte las peticiones con `least_conn`, porque el tiempo de
   procesamiento varía mucho según el PDF.
-- **extractor:** FastAPI + uvicorn, sin estado. La extracción a Markdown (PyMuPDF vía
-  pymupdf4llm, conversor clásico) corre en un pool de procesos separado del event loop. Un control de admisión deja procesar un PDF por vez
-  por réplica (1 CPU) y responde 503 si una petición espera más de `QUEUE_TIMEOUT_S`
-  (20 s por defecto).
+- **extractor:** FastAPI + uvicorn, sin estado. La extracción a Markdown (PyMuPDF con un
+  conversor propio y liviano) corre en un pool de procesos separado del event loop. Un
+  control de admisión deja procesar un PDF por vez por réplica (1 CPU) y responde 503 si
+  una petición espera más de `QUEUE_TIMEOUT_S`.
 
-Decisiones de diseño: _(completar a medida que se toman, con su justificación)_
+Decisiones de diseño (cada una justificada con mediciones en la sección 4):
+
+| Decisión | Por qué |
+|---|---|
+| nginx con `least_conn`, `proxy_request_buffering off` y buffer de 256 KB | Con PDFs de varios MB, la configuración por defecto convertía al balanceador en el cuello de botella (Experimento 0). |
+| Extracción en un pool de procesos | La extracción es CPU-bound: en el event loop bloqueaba hasta `/health` (Experimento 1). |
+| 503 tras una espera máxima | Procesar peticiones que el cliente ya abandonó es CPU tirada (Experimento 1). |
+| El lugar se toma antes de leer el body | Las peticiones en espera no ocupan memoria con su PDF. |
+| PyMuPDF con Markdown propio, no pypdf ni pymupdf4llm | Con los PDFs oficiales es entre 10 y 20 veces más rápido y sigue dando Markdown (Experimentos 2 y 3). |
+| PDF crudo en el body | Es lo que envían los scripts del profesor; evita el costo del multipart. |
 
 ## 2. Entorno de medición
 
@@ -32,23 +41,40 @@ CPU, así que los números dependen de este hardware.
 
 ## 3. Resultados
 
+Con los 4 PDFs oficiales. Los números del profesor son de su máquina; los nuestros, del
+entorno de la sección 2.
+
 ### k6, spike (modelo cerrado)
 
-| Versión | Peticiones | req/s | Error | p50 | p90 | p95 | Máx |
-|---|---|---|---|---|---|---|---|
-| Profesor | 1.037 | 25,35 | 0,00 % | 1,88 s | 7,83 s | 8,80 s | 13,94 s |
-| Base (pypdf) | | | | | | | |
+| Versión | Peticiones | req/s | Error | p50 | p95 | Máx |
+|---|---|---|---|---|---|---|
+| Profesor | 1.037 | 25,35 | 0,00 % | 1,88 s | 8,80 s | 13,94 s |
+| Antes: base (pypdf, sin backpressure) | 107 | 1,54 | 14,01 % | 19,22 s | 59,99 s | 59,99 s |
+| **Después: final** | 654 | **15,70** | 3,66 % | **4,84 s** | **10,12 s** | 20,01 s |
 
 ### Vegeta, carga fija a 50 req/s (modelo abierto)
 
-| Versión | req/s efectivas | Éxito | Timeouts | p50 |
-|---|---|---|---|---|
-| Profesor | 16,65 | 66,53 % | 33,40 % | 14,89 s |
-| Base (pypdf) | | | | |
+| Versión | req/s efectivas | Éxito | Timeouts | 503 | p50 |
+|---|---|---|---|---|---|
+| Profesor | 16,65 | 66,53 % | 33,40 % | — | 14,89 s |
+| Antes: base (pypdf, sin backpressure) | 0,65 | 2,60 % | 97,40 % | 0 | 30,00 s |
+| **Después: final** | **4,36** | **15,20 %** | **1,20 %** | 83,60 % | 20,01 s |
+
+La versión final multiplica por 10 el throughput de k6 y casi elimina los timeouts de
+Vegeta, pero en este hardware no alcanza al profesor (ver sección 5). En k6 los
+resultados varían entre corridas: una repetición dio 11,12 req/s con 7,50 % de error
+(Experimento 4).
 
 ## 4. Proceso de investigación
 
 Un experimento por cambio, medido con los mismos scripts.
+
+Hubo dos etapas. En la primera (Experimentos 0 a 2) todavía no teníamos los PDFs oficiales y
+medimos con PDFs sintéticos o provisorios (los de la consigna, de 122 y 172 KB). Al llegar
+el set oficial (Experimento 3) los resultados cambiaron mucho: los PDFs livianos nos
+habían dado una imagen demasiado optimista, y una decisión (pymupdf4llm) tuvo que
+revertirse. Lo dejamos documentado porque es parte del proceso: **hay que medir con la
+carga real**.
 
 ### Experimento 0: techo de la infraestructura (stub sin procesamiento)
 
@@ -163,15 +189,98 @@ los 4 oficiales), así que sirve para comparar versiones entre sí, no contra el
 - **Resultado:** ~2,8 veces más throughput en los dos modelos de carga y latencias divididas
   por tres, sin errores en k6 ni timeouts en Vegeta. Cada réplica usa ~170 MB de su 1 GB.
 - **Calidad:** el contenido pasa a ser Markdown real (títulos, negritas, párrafos).
-- **Conclusión:** se mantiene.
+- **Conclusión (provisoria):** se mantenía con estos PDFs; el Experimento 3 la revierte.
 
-### Experimento N: _(título)_
+### Experimento 3: medición con los PDFs oficiales
 
-- **Hipótesis:**
-- **Cambio:**
-- **Resultado:** _(métricas antes / después)_
-- **Conclusión:** _(se mantiene o se descarta, y por qué)_
+Set oficial: Scrum Guide (0,3 MB, 16 págs.), Kanban (8,5 MB, 90 págs.), Filosofía Lean
+(0,6 MB, 42 págs.) y Scrum Manager (3,7 MB, 62 págs.).
+
+**Tiempo por PDF** (mediana de 5 extracciones en un solo hilo):
+
+| Opción | Scrum Guide | Kanban | Filosofía Lean | Scrum Manager | Promedio | Markdown |
+|---|---|---|---|---|---|---|
+| pypdf | 1.993 ms | 5.423 ms | 1.922 ms | 5.060 ms | 3.600 ms | No |
+| pymupdf4llm (Experimento 2) | 837 ms | 3.909 ms | 2.449 ms | 3.069 ms | 2.566 ms | Sí |
+| pymupdf4llm sin detectar títulos | 1.037 ms | 3.820 ms | 2.318 ms | 2.863 ms | 2.509 ms | Sí |
+| PyMuPDF, texto plano | 84 ms | 304 ms | 206 ms | 191 ms | 196 ms | No |
+| pypdfium2, texto plano | 111 ms | 360 ms | 206 ms | 310 ms | 247 ms | No |
+| **PyMuPDF + Markdown propio** | **90 ms** | **255 ms** | **183 ms** | **179 ms** | **177 ms** | **Sí** |
+
+- Con estos PDFs pymupdf4llm tarda segundos por PDF: con 5 réplicas no llegaría ni a
+  2 req/s. El profesor sostiene 25 req/s, o sea ~0,2 s de CPU por petición.
+- **Cambio:** un conversor propio sobre `page.get_text("dict")` de PyMuPDF. Cada bloque de
+  texto es un párrafo; el texto 1,5 veces más grande que el cuerpo (el tamaño más usado
+  del documento) es título `#`, y 1,2 veces, subtítulo `##`; el texto todo en negrita va
+  entre `**`. Tarda menos que el texto plano y entra en el presupuesto del profesor.
+  pymupdf4llm deja de ser dependencia, y con él ~64 MB de RAM por proceso.
+
+**Bajo carga**, misma infraestructura, cambiando sólo `extractor/`:
+
+| Versión | Vegeta éxito | Vegeta req/s efectivas | Vegeta timeouts | k6 req/s | k6 error | k6 p50 | k6 p95 |
+|---|---|---|---|---|---|---|---|
+| Stub (techo de la infraestructura) | 100 % | 49,98 | 0 | 133,18 | 0,00 % | 0,48 s | 1,36 s |
+| Base (pypdf) | 2,60 % | 0,65 | 1.461 | 1,54 | 14,01 % | 19,22 s | 59,99 s |
+| Backpressure + pypdf | 1,80 % | 0,49 | 28 | 3,62 | 65,00 % | 19,99 s | 24,48 s |
+| Backpressure + pymupdf4llm | 2,73 % | 0,77 | 24 | 3,81 | 54,62 % | 19,99 s | 21,99 s |
+| **Backpressure + Markdown propio** | **15,20 %** | **4,36** | 18 | **15,70** | **3,66 %** | **4,84 s** | **10,12 s** |
+
+- **Techo de la infraestructura (#25):** con el set oficial, nginx sostiene los 50 req/s de
+  Vegeta sin errores y 133 req/s en el spike. El límite está en el extractor.
+- Con pypdf o pymupdf4llm el servicio está tan saturado que casi todo termina en 503: el
+  backpressure protege a las réplicas pero no puede crear capacidad.
+- **Conclusión:** se mantiene el Markdown propio.
+
+### Experimento 4: espera de 25 s antes del 503
+
+- **Hipótesis:** los errores de k6 en la versión final son 503 de peticiones que esperaron
+  20 s. Con 25 s (todavía por debajo de los 30 s de timeout de Vegeta) deberían
+  desaparecer sin perjudicar a Vegeta.
+
+- **Cambio:** `QUEUE_TIMEOUT_S=25`, sin tocar el código.
+
+| Espera | Vegeta éxito | Vegeta req/s efectivas | k6 req/s | k6 error | k6 p50 | k6 p95 |
+|---|---|---|---|---|---|---|
+| 20 s (corrida 1) | 15,20 % | 4,36 | 15,70 | 3,66 % | 4,84 s | 10,12 s |
+| 20 s (corrida 2) | 15,27 % | 4,44 | 11,12 | 7,50 % | 5,66 s | 20,00 s |
+| 25 s | 13,47 % | 3,58 | 6,73 | 20,63 % | 6,02 s | 25,00 s |
+
+- **Resultado:** con 25 s empeoran los dos modelos. Más peticiones esperan cerca del límite
+  y terminan igual en 503, ahora más tarde, mientras el servicio ya está al máximo de
+  capacidad: esperar más no crea capacidad.
+- **Variación entre corridas:** repetir la misma configuración (20 s) dio resultados
+  estables en Vegeta (15,2 % y 15,3 %) pero no en k6 (15,7 y 11,1 req/s). En una notebook,
+  la temperatura y otros procesos del sistema afectan la CPU disponible: para comparar
+  variantes parecidas conviene repetir cada medición varias veces.
+- **Conclusión:** se descarta; queda 20 s por defecto.
 
 ## 5. Cuello de botella y conclusiones
 
-_(completar)_
+**El cuello de botella es la CPU.** Con el set oficial, la extracción de un PDF cuesta en
+promedio ~0,18 s de CPU con la versión final (era ~3,6 s con pypdf). El techo de la
+infraestructura (133 req/s en el spike con el stub) está muy por encima de lo que
+consigue el extractor, así que nginx, la red y el generador de carga no son el límite
+principal.
+
+En este hardware, además, la CPU disponible es menor que la que suman los límites del
+compose: 5 réplicas de 1 CPU más nginx sobre un procesador de notebook de 4 núcleos
+físicos, con k6 o Vegeta corriendo en la misma máquina. Bajo Vegeta se nota más: mover
+~170 MB/s de PDFs le quita CPU a las réplicas. Por eso nuestros números no son
+directamente comparables con los del profesor, medidos en su máquina; la comparación
+justa es correr las dos versiones en el mismo equipo.
+
+Lo que logramos, medido en el mismo hardware y con el set oficial:
+
+- **k6:** de 1,54 a 15,70 req/s (×10), con la mediana de 19,2 s a 4,8 s.
+- **Vegeta:** los timeouts pasan de 97 % a ~1 %. Las peticiones que no se pueden atender
+  reciben 503 a los pocos segundos en vez de colgarse hasta el timeout, y las réplicas
+  se recuperan al instante en vez de quedar procesando trabajo abandonado.
+- **Salida:** `content` en Markdown (títulos, párrafos, negritas) y no texto plano.
+
+Lo que más pesó, en orden: cambiar la librería y la forma de generar el Markdown
+(Experimentos 2 y 3), sacar la extracción del event loop con rechazo temprano
+(Experimento 1) y ajustar nginx para PDFs grandes (Experimento 0).
+
+Próximos pasos posibles, todos medibles con los mismos scripts: variar la cantidad de
+réplicas y de workers por réplica según los núcleos del equipo, y medir en un equipo
+con más núcleos físicos para separar el límite del hardware del límite del servicio.
