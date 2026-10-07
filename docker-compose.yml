@@ -1,9 +1,13 @@
+# Nombre de proyecto propio: sin él, Compose usa el nombre de la carpeta, y otro
+# repo llamado pdf-extractext (por ejemplo, el de otro grupo) pisaría estos contenedores.
+name: pdf-extractext-mansalve-praderio-quiroga
+
+# Los puertos del host son configurables (ver .env.example) por si ya están en uso.
 services:
   api:
     build: .
-    container_name: pdf-extractext-api
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
     environment:
       # Sobrescribimos el URI para que apunte al contenedor de MongoDB en lugar de localhost
       - MONGODB_URI=mongodb://mongodb:27017
@@ -29,9 +33,9 @@ services:
 
   mongodb:
     image: mongo:latest
-    container_name: pdf-extractext-mongo
     ports:
-      - "27017:27017"
+      # Expuesto para los tests de integración que corren desde el host.
+      - "${MONGO_PORT:-27017}:27017"
     volumes:
       - mongo_data:/data/db
     restart: always
@@ -44,7 +48,7 @@ services:
       start_period: 30s
 
   # ── Extractor ───────────────────────────────────────────────────
-  # Sin container_name ni ports: tienen que ser únicos y no admiten réplicas.
+  # Sin ports: un puerto del host no se puede repartir entre réplicas.
   # Se accede sólo a través de extractor-lb.
   extractor:
     build: ./extractor
