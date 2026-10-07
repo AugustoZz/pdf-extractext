@@ -78,8 +78,27 @@ configuraciones entre sí, no contra el profesor.
   hasta que el extractor use un timeout de keep-alive mayor que el de nginx.
 - **Techo de la infraestructura:** ~184 req/s en el spike, siete veces el throughput del
   profesor. A partir de acá el límite lo pone el extractor.
-- **Pendiente:** k6 usa ~3,5 GB de RAM (cada VU guarda su copia de los PDFs) y compite con
-  las réplicas por la memoria del host.
+### Ajuste del generador de carga: memoria de k6
+
+k6 corre en el mismo host que el servicio, así que la RAM que usa se la quita a las
+réplicas. Con el script original llegaba a casi 4 GB de los 7,6 GB de la VM de Docker.
+Medido con el spike completo contra el stub (pico de memoria del contenedor de k6):
+
+| Variante | Pico de RAM | req/s | Error |
+|---|---|---|---|
+| Script original (`open()` clásico) | 3.932 MiB | 170,1 | 0,00 % |
+| PDFs compartidos (`k6/experimental/fs`) | 3.123 MiB | 160,2 | 0,00 % |
+| Script original + `GOMEMLIMIT=1GiB` | 2.038 MiB | 205,0 | 0,00 % |
+| **PDFs compartidos + `GOMEMLIMIT=1GiB`** | **986 MiB** | 161,2 | 0,00 % |
+
+- **Por qué hacen falta las dos:** el `open()` clásico guarda una copia de los PDFs por VU
+  (100 copias, ~1,3 GB siempre vivos), y el recolector de Go deja crecer la memoria al
+  doble de lo que se usa antes de liberar. Con los PDFs compartidos queda poco vivo, y
+  `GOMEMLIMIT` hace que el recolector lo libere antes.
+- **Comparabilidad:** la petición es la misma que la del script del profesor (PDF crudo,
+  elegido al azar); sólo cambia cómo k6 guarda los archivos en memoria.
+- Las diferencias de req/s entre variantes están dentro de la variación entre corridas
+  contra el stub.
 
 ### Experimento N: _(título)_
 

@@ -92,6 +92,9 @@ services:
       # Dashboard en vivo (http://localhost:5665) y exportado a HTML para el informe.
       - K6_WEB_DASHBOARD=true
       - K6_WEB_DASHBOARD_EXPORT=/stress/results/k6-spike.html
+      # Límite blando para el recolector de Go: sin él k6 deja crecer la memoria
+      # al doble de lo que usa y llegaba a ~3 GB, compitiendo con las réplicas.
+      - GOMEMLIMIT=1GiB
     ports:
       - "5665:5665"
     volumes:
