@@ -19,10 +19,17 @@ class TestExtract:
         for text in ("Primera", "Segunda", "Tercera"):
             assert text in result.content
 
-    def test_content_is_markdown(self):
+    def test_bold_text_is_marked_as_bold(self):
         result = extract(build_pdf("Texto importante", font="Helvetica-Bold"))
 
         assert "**Texto importante**" in result.content
+
+    def test_text_larger_than_the_body_becomes_a_heading(self):
+        pdf = build_pdf("Titulo", "Subtitulo", "Cuerpo", "Mas cuerpo", sizes=(24, 15, 12, 12))
+
+        lines = extract(pdf).content.split("\n\n")
+
+        assert lines[:4] == ["# Titulo", "## Subtitulo", "Cuerpo", "Mas cuerpo"]
 
     def test_pdf_without_selectable_text_returns_empty_content(self, blank_pdf):
         result = extract(blank_pdf)
