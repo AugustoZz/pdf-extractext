@@ -48,6 +48,10 @@ services:
   # Se accede sólo a través de extractor-lb.
   extractor:
     build: ./extractor
+    environment:
+      # Sin valor: se pasa sólo si está definida en el host; si no, rige el
+      # valor por defecto de extractor_service/config.py.
+      - QUEUE_TIMEOUT_S
     deploy:
       # El TP permite hasta 5 réplicas; variable para comparar escenarios.
       replicas: ${EXTRACTOR_REPLICAS:-5}

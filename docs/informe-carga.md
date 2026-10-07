@@ -8,7 +8,10 @@ cliente (k6 / Vegeta) ──► extractor-lb (nginx, least_conn) ──► extra
 
 - **extractor-lb:** reparte las peticiones con `least_conn`, porque el tiempo de
   procesamiento varía mucho según el PDF.
-- **extractor:** _(completar: librería, modelo de workers, control de concurrencia)_
+- **extractor:** FastAPI + uvicorn, sin estado. La extracción (pypdf) corre en un pool de
+  procesos separado del event loop. Un control de admisión deja procesar un PDF por vez
+  por réplica (1 CPU) y responde 503 si una petición espera más de `QUEUE_TIMEOUT_S`
+  (20 s por defecto).
 
 Decisiones de diseño: _(completar a medida que se toman, con su justificación)_
 
@@ -99,6 +102,33 @@ Medido con el spike completo contra el stub (pico de memoria del contenedor de k
   elegido al azar); sólo cambia cómo k6 guarda los archivos en memoria.
 - Las diferencias de req/s entre variantes están dentro de la variación entre corridas
   contra el stub.
+
+### Experimento 1: backpressure (pool de procesos + 503 por saturación)
+
+Medido con PDFs **provisorios** (los dos PDFs de la cátedra, de 122 y 172 KB, rotando como
+los 4 oficiales), así que sirve para comparar versiones entre sí, no contra el profesor.
+
+- **Hipótesis:** en la versión base la extracción bloquea el event loop. Bajo sobrecarga
+  las peticiones esperan hasta el timeout del cliente y el servicio sigue procesando las
+  que el cliente ya abandonó: CPU tirada.
+- **Cambio:** la extracción pasa a un `ProcessPoolExecutor`, y un control de admisión
+  rechaza con 503 a las peticiones que no consiguen lugar en `QUEUE_TIMEOUT_S`. El lugar
+  se toma antes de leer el body, para que las peticiones en espera no ocupen memoria.
+
+| Versión | Vegeta éxito | Vegeta timeouts | Vegeta p50 | Vegeta req/s efectivas | Recuperación tras la prueba | k6 req/s | k6 error | k6 p50 | k6 p95 |
+|---|---|---|---|---|---|---|---|---|---|
+| Base | 18,3 % (275) | 1.225 | 30,0 s | 4,58 | ~110 s | 7,21 | 0,00 % | 11,45 s | 17,46 s |
+| Backpressure, espera 10 s | 19,3 % (290) | 0 | 10,0 s | 7,14 | — | 9,53 | 14,84 % | 9,22 s | 10,70 s |
+| **Backpressure, espera 20 s** | **23,7 % (355)** | **0** | 20,0 s | 6,99 | ~5 s | 7,23 | **0,00 %** | 12,05 s | 15,51 s |
+
+- **Resultado:** sin timeouts, 29 % más peticiones exitosas en Vegeta, y las réplicas se
+  recuperan al instante: en la base quedaban "unhealthy" (ni `/health` respondía) y
+  tardaban ~110 s en vaciar el trabajo abandonado.
+- **El tiempo de espera es un compromiso:** con 10 s se rechaza de más y k6 (modelo
+  cerrado, sin timeout de 30 s) pasa a tener 15 % de errores. Con 20 s, k6 queda igual que
+  la base y Vegeta mejora.
+- **Conclusión:** se mantiene, con 20 s por defecto. El throughput total casi no cambia:
+  el límite sigue siendo la extracción con pypdf, que es lo que ataca #32.
 
 ### Experimento N: _(título)_
 
