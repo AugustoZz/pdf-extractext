@@ -5,12 +5,22 @@ Todo corre en Docker: no hace falta instalar k6 ni Vegeta.
 
 ```
 tests/stress/
-├── pdfs/      los 4 PDFs oficiales de la cátedra
+├── pdfs/      los 4 PDFs oficiales de la cátedra (no se versionan)
 ├── k6/        prueba spike, modelo cerrado
 ├── vegeta/    prueba de carga fija, modelo abierto
-├── stub/      extractor falso para probar la infraestructura
 └── results/   salida de cada corrida (ignorada por git)
 ```
+
+## PDFs de prueba
+
+Son material de terceros, así que no están en el repo. Antes de correr las pruebas hay
+que copiar en `tests/stress/pdfs/` los 4 PDFs oficiales que provee la cátedra, con estos
+nombres exactos (los usan los scripts):
+
+- `2020-Scrum-Guide-Spanish-Latin-South-American.pdf`
+- `Essential-Kanban-Condensed-Spanish.pdf`
+- `Filosofia Lean.pdf`
+- `scrum_manager_historias_usuario.pdf`
 
 Igual que los scripts del profesor, el PDF va crudo en el body con
 `Content-Type: application/pdf`. Desde el host, el extractor responde en
@@ -33,15 +43,6 @@ docker compose run --rm vegeta
 Mientras corre k6, el dashboard en vivo está en http://localhost:5665.
 
 Vegeta acepta `RATE`, `DURATION` y `TIMEOUT` como variables de entorno,
-por ejemplo `docker compose run --rm -e RATE=25 vegeta`. Para cambiar la cantidad de
-réplicas del extractor: `EXTRACTOR_REPLICAS=1 docker compose up -d`.
-
-## Probar sin el extractor real
-
-Mientras `extractor/` no exista, el stub ocupa su lugar:
-
-```bash
-docker compose -f docker-compose.yml -f tests/stress/stub/compose.stub.yml up --build -d
-```
-
-Las pruebas se corren con los mismos comandos de arriba, agregando los dos `-f`.
+por ejemplo `docker compose run --rm -e RATE=25 vegeta`. Del lado del servicio se
+pueden variar la cantidad de réplicas (`EXTRACTOR_REPLICAS`) y la espera máxima antes
+del 503 (`QUEUE_TIMEOUT_S`), por ejemplo `EXTRACTOR_REPLICAS=1 docker compose up -d`.
