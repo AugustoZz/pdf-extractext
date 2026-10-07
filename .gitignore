@@ -145,3 +145,7 @@ migrations/
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .github/instructions/snyk_rules.instructions.md
+
+# Resultados de las pruebas de carga (se regeneran en cada corrida)
+tests/stress/results/*
+!tests/stress/results/.gitkeep

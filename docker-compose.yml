@@ -43,5 +43,70 @@ services:
       # Margen para el primer arranque, cuando mongod crea los archivos de datos.
       start_period: 30s
 
+  # ── Extractor ───────────────────────────────────────────────────
+  # Sin container_name ni ports: tienen que ser únicos y no admiten réplicas.
+  # Se accede sólo a través de extractor-lb.
+  extractor:
+    build: ./extractor
+    deploy:
+      # El TP permite hasta 5 réplicas; variable para comparar escenarios.
+      replicas: ${EXTRACTOR_REPLICAS:-5}
+      resources:
+        # Límites máximos que admite el TP por réplica.
+        limits:
+          cpus: "1.0"
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  extractor-lb:
+    image: nginx:1.27-alpine
+    ports:
+      # 8080 es el puerto al que apuntan los scripts del profesor.
+      - "${EXTRACTOR_PORT:-8080}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      extractor:
+        # nginx resuelve las IPs de las réplicas al arrancar: tienen que existir ya.
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          # Con 256M el kernel mataba workers de nginx bajo el spike de 100 VUs.
+          memory: 512M
+    restart: unless-stopped
+
+  # ── Pruebas de carga ────────────────────────────────────────────
+  # Perfil "stress": no arrancan con `docker compose up`, se corren a pedido.
+  k6:
+    image: grafana/k6:2.3.0
+    profiles: ["stress"]
+    command: ["run", "--summary-export=/stress/results/k6-spike.json", "/stress/k6/spike.js"]
+    environment:
+      # Dashboard en vivo (http://localhost:5665) y exportado a HTML para el informe.
+      - K6_WEB_DASHBOARD=true
+      - K6_WEB_DASHBOARD_EXPORT=/stress/results/k6-spike.html
+    ports:
+      - "5665:5665"
+    volumes:
+      - ./tests/stress:/stress
+    depends_on:
+      - extractor-lb
+
+  vegeta:
+    build: ./tests/stress/vegeta
+    profiles: ["stress"]
+    entrypoint: ["sh", "/stress/vegeta/run.sh"]
+    volumes:
+      - ./tests/stress:/stress
+    depends_on:
+      - extractor-lb
+
 volumes:
   mongo_data:

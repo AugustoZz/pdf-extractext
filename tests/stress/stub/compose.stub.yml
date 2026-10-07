@@ -1,0 +1,7 @@
+# Reemplaza la imagen del extractor por el stub mientras extractor/ no existe.
+# Uso (desde la raíz del repo):
+#   docker compose -f docker-compose.yml -f tests/stress/stub/compose.stub.yml up --build
+# Las rutas son relativas al primer archivo (la raíz del repo).
+services:
+  extractor:
+    build: tests/stress/stub
