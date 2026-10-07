@@ -29,6 +29,7 @@ Es el formato que envían los scripts de k6 y Vegeta de la cátedra.
 |-----------------------------------|--------|------------------------------------------------|
 | Body vacío o sin firma `%PDF`     |  422   | `{"detail": "El archivo no tiene firma PDF..."}` |
 | PDF corrupto                      |  422   | `{"detail": "El archivo PDF está corrupto..."}`  |
+| PDF protegido con contraseña      |  422   | `{"detail": "El archivo PDF está protegido..."}` |
 | Supera el tamaño máximo           |  413   | `{"detail": "El archivo supera el tamaño..."}`   |
 | Servicio saturado (backpressure)  |  503   | `{"detail": "Servicio saturado, reintentar."}`   |
 
@@ -39,7 +40,9 @@ a tiempo, en vez de encolarla hasta que el cliente corte por timeout.
 200 `{"status": "ok"}`
 
 ## Validaciones
-- El extractor valida el contenido: tamaño, firma `%PDF` e integridad.
+- El extractor valida el contenido: tamaño, firma `%PDF`, integridad y que no
+  requiera contraseña de apertura. Los PDFs con restricciones de propietario pero
+  sin clave de apertura se aceptan.
 - La extensión `.pdf` y el content-type los valida quien llama (documents-service).
 
 ## Ejecución
