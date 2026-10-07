@@ -18,7 +18,11 @@ logger = logging.getLogger(__name__)
 
 
 class PDFValidationError(ValueError):
-    """Se lanza cuando el archivo no es un PDF válido o supera el tamaño máximo."""
+    """Se lanza cuando el archivo no es un PDF válido."""
+
+
+class PDFTooLargeError(PDFValidationError):
+    """Se lanza cuando el archivo supera el tamaño máximo permitido."""
 
 
 class PDFExtractorService:
@@ -50,7 +54,8 @@ class PDFExtractorService:
             ExtractedDocument con texto, page_count y metadata.
 
         Raises:
-            PDFValidationError: Si el archivo no es PDF válido o es demasiado grande.
+            PDFValidationError: Si el archivo no es un PDF válido.
+            PDFTooLargeError: Si el archivo supera el tamaño máximo.
         """
         self.validate_pdf(file_bytes)
         reader = self._get_reader(file_bytes)
@@ -77,7 +82,7 @@ class PDFExtractorService:
             PDFValidationError: Si el archivo no es válido.
         """
         if len(file_bytes) > self._max_bytes:
-            raise PDFValidationError(
+            raise PDFTooLargeError(
                 f"El archivo supera el tamaño máximo de {self._max_bytes // (1024 * 1024)} MB."
             )
         if not file_bytes.startswith(b"%PDF"):

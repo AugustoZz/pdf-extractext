@@ -11,7 +11,7 @@ from pymongo.errors import DuplicateKeyError
 
 from app.core.config import settings
 from app.infrastructure.database.repository import DocumentRepository
-from app.services.extractor import PDFExtractorService, PDFValidationError
+from app.services.extractor import PDFExtractorService, PDFValidationError, PDFTooLargeError
 from app.services.checksum import calculate_checksum
 
 router = APIRouter()
@@ -21,6 +21,8 @@ _service = PDFExtractorService(max_file_size_mb=settings.MAX_FILE_SIZE_MB)
 # y no tiene sentido devolverlo tal cual en un mensaje de error.
 _DUPLICATE_DETAIL = "El documento ya existe en la base de datos (checksum duplicado)."
 
+# Tamaño máximo en bytes (para validar antes de hashear).
+_MAX_FILE_BYTES = settings.MAX_FILE_SIZE_MB * 1024 * 1024
 
 # Tipos que usan los clientes que no declaran un MIME real (curl, algunos SDK).
 # No se rechazan: la validación que vale es la firma %PDF del contenido.
@@ -61,22 +63,32 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
     _validate_upload(file)
     file_bytes = await file.read()
 
-    # 1. Calcular el checksum antes de extraer para evitar proceso innecesario si ya existe
+    # 1. Validar tamaño ANTES de hashear: si el archivo es demasiado grande,
+    #    no tiene sentido calcular el checksum ni ocupar más memoria.
+    if len(file_bytes) > _MAX_FILE_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"El archivo supera el tamaño máximo de {settings.MAX_FILE_SIZE_MB} MB.",
+        )
+
+    # 2. Calcular el checksum antes de extraer para evitar proceso innecesario si ya existe
     checksum = calculate_checksum(file_bytes)
 
-    # 2. Verificar duplicado en la BD (atajo: evita extraer texto en vano).
-    #    La garantía real la da el índice único sobre 'checksum'; ver paso 4.
+    # 3. Verificar duplicado en la BD (atajo: evita extraer texto en vano).
+    #    La garantía real la da el índice único sobre 'checksum'; ver paso 5.
     existing_doc = await DocumentRepository.get_by_checksum(checksum)
     if existing_doc:
         raise HTTPException(status_code=409, detail=_DUPLICATE_DETAIL)
 
-    # 3. Procesar y extraer texto
+    # 4. Procesar y extraer texto
     try:
         doc = _service.extract(file_bytes)
+    except PDFTooLargeError as exc:
+        raise HTTPException(status_code=413, detail=str(exc)) from exc
     except PDFValidationError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
-    # 4. Guardar en Base de Datos
+    # 5. Guardar en Base de Datos
     data_to_insert = {
         "filename": file.filename,
         "page_count": doc.page_count,
@@ -89,7 +101,8 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
     try:
         saved_doc = await DocumentRepository.create(data_to_insert)
     except DuplicateKeyError as exc:
-        # Otra petición insertó el mismo PDF entre el paso 2 y este insert.
+        # Otra petición insertó el mismo PDF entre el paso 3 y este insert.
         raise HTTPException(status_code=409, detail=_DUPLICATE_DETAIL) from exc
 
     return JSONResponse(status_code=201, content=saved_doc)
+

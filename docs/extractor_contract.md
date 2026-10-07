@@ -14,21 +14,21 @@
 }
 
 - `text`: puede ser "" (PDF escaneado sin texto seleccionable)
-- `page count`: entero, mayor o igual a 1
+- `page_count`: entero, mayor o igual a 1
 - `metadata`: objeto; claves en minúsculas; puede ser {}
 
 
 ### Errores
-| Situación                        | Código | Cuerpo         |
-|----------------------------------|--------|----------------|
-| Sin firma %PDF                   |  422   | {"detail": "mensaje en texto"}  |
-| PDF corrupto                     |  422   | {"detail": "mensaje en texto"}  |
-| Supera el tamaño máximo          |  422   | {"detail": "mensaje en texto}  |
-| Falta el campo `file`            |  422   | (lo genera FastAPI) |
+| Situación                        | Código | Cuerpo                                            |
+|----------------------------------|--------|-------------------------------------------------  |
+| Sin firma %PDF                   |  422   | {"detail": "El archivo no tiene firma PDF..."}     |
+| PDF corrupto                     |  422   | {"detail": "El archivo PDF está corrupto..."}      |
+| Supera el tamaño máximo          |  413   | {"detail": "El archivo supera el tamaño..."}       |
+| Falta el campo `file`            |  422   | (lo genera FastAPI)                                |
 
 ## Validaciones
 - El extractor valida el contenido: tamaño, firma %PDF e integridad
-- La extensión .pdf y el content-type los valida quen llama
+- La extensión .pdf y el content-type los valida quien llama
 
 ## GET /health
 200 {"status": "ok"}
