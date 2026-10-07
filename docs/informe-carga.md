@@ -16,13 +16,16 @@ Decisiones de diseño: _(completar a medida que se toman, con su justificación)
 
 | | |
 |---|---|
-| Host | _(CPU, núcleos, RAM, sistema operativo)_ |
-| Docker | _(versión)_ |
+| Host | Intel Core i5-8365U (notebook, 4 núcleos / 8 hilos, 1,6 GHz base), 15,8 GB de RAM, Windows 11 Pro |
+| Docker | Docker Desktop 29.8.2 (VM con 8 CPUs y 7,6 GB de RAM), Compose 5.5.1 |
 | Límites por réplica | 1.0 CPU, 1 GB RAM |
+| Balanceador | nginx 1.27, 1.0 CPU, 512 MB RAM |
 | Réplicas | 5 |
 | PDFs | `tests/stress/pdfs` (set oficial de la cátedra) |
 
-Los generadores de carga corren en el mismo host y compiten por CPU con el servicio.
+Los límites suman 6 CPUs (5 réplicas + nginx) sobre 4 núcleos físicos, y los
+generadores de carga corren en el mismo host: bajo carga máxima todos compiten por
+CPU, así que los números dependen de este hardware.
 
 ## 3. Resultados
 
