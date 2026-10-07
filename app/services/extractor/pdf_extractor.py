@@ -8,8 +8,7 @@ import io
 import logging
 import re
 
-import pypdf
-from pypdf import PdfReader
+from pypdf import PasswordType, PdfReader
 from pypdf.errors import PdfReadError
 
 from app.services.extractor.models import ExtractedDocument
@@ -27,7 +26,6 @@ class PDFExtractorService:
       1. Validar el PDF (formato y tamaño).
       2. Extraer texto de todas las páginas.
       3. Extraer metadatos del PDF.
-      4. Calcular el checksum SHA-256.
 
     Uso:
         service = PDFExtractorService(max_file_size_mb=10)
@@ -65,7 +63,7 @@ class PDFExtractorService:
 
     def validate_pdf(self, file_bytes: bytes) -> bool:
         """
-        Valida que los bytes correspondan a un PDF válido y dentro del límite de tamaño.
+        Valida que los bytes correspondan a un PDF válido, que no requiera contraseña de apertura y dentro del límite de tamaño.
 
         Args:
             file_bytes: Contenido del archivo.
@@ -83,9 +81,11 @@ class PDFExtractorService:
         if not file_bytes.startswith(b"%PDF"):
             raise PDFValidationError("El archivo no tiene la firma PDF válida (%PDF).")
         try:
-            self._get_reader(file_bytes)
+            reader=self._get_reader(file_bytes)
         except PdfReadError as exc:
             raise PDFValidationError(f"El archivo PDF está corrupto o no es válido: {exc}") from exc
+        if reader.is_encrypted and reader.decrypt("") == PasswordType.NOT_DECRYPTED:
+            raise PDFValidationError("El archivo PDF está protegido con contraseña y no se puede procesar, quite la contraseña e intente de nuevo.")
         return True
 
     def extract_text(self, file_bytes: bytes) -> str:

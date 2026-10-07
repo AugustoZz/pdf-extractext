@@ -25,10 +25,15 @@
 | PDF corrupto                     |  422   | {"detail": "mensaje en texto"}  |
 | Supera el tamaño máximo          |  422   | {"detail": "mensaje en texto}  |
 | Falta el campo `file`            |  422   | (lo genera FastAPI) |
+| PDF protegido con contraseña     |  422   | {"detail": "mensaje en texto}  |
 
 ## Validaciones
 - El extractor valida el contenido: tamaño, firma %PDF e integridad
 - La extensión .pdf y el content-type los valida quen llama
+- Los PDFs con restricciones pero sin clave de apertura se aceptan
+
+## To-do
+- Resolver conflictos de tamaño máximo del file, decidir quien valida el tamaño de archivo
 
 ## GET /health
 200 {"status": "ok"}

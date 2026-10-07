@@ -4,6 +4,8 @@ Sigue TDD: cada test documenta el comportamiento esperado
 antes o en paralelo a la implementación (sub-issue 1B).
 """
 import pytest
+import io
+from pypdf import PdfWriter
 
 from app.services.extractor import (
     PDFExtractorService,
@@ -24,6 +26,48 @@ def strict_service() -> PDFExtractorService:
     """Servicio con límite de 1 MB para forzar error de tamaño."""
     return PDFExtractorService(max_file_size_mb=1)
 
+# ── Tests de Casos Límite y fixtures ───────────────────────────────────────
+@pytest.fixture
+def pdf_cifrado() -> bytes:
+    """Genera un PDF cifrado para testear la extracción de texto."""
+    writer = PdfWriter()
+    writer.add_blank_page(width=72, height=72)
+    writer.encrypt(user_password="test", owner_password="owner")
+    pdf_bytes = io.BytesIO()
+    writer.write(pdf_bytes)
+    return pdf_bytes.getvalue()
+
+@pytest.fixture
+def pdf_cifrado_contraseña_vacia() -> bytes:
+    """Genera un PDF cifrado con contraseña vacía para testear la extracción de texto."""
+    writer = PdfWriter()
+    writer.add_blank_page(width=72, height=72)
+    writer.encrypt(user_password="", owner_password="owner")
+    pdf_bytes = io.BytesIO()
+    writer.write(pdf_bytes)
+    return pdf_bytes.getvalue()
+
+class TestCasosLimite:
+    def test_pdf_cifrado_raises(self, service, pdf_cifrado):
+        """Un PDF cifrado debe lanzar PDFValidationError al extraer texto."""
+        with pytest.raises(PDFValidationError,match = "contraseña"):
+            service.extract(pdf_cifrado)
+
+    def test_pdf_cifrado_contraseña_vacia(self,service,pdf_cifrado_contraseña_vacia):
+        """Si solo tiene contraseña de propietario, aceptamos el PDF y extraemos texto."""
+        doc = service.extract(pdf_cifrado_contraseña_vacia)
+        assert doc.page_count==1  # Debe reconocer la página
+
+    def test_validate_pdf_corrupt_with_valid_header(self, service):
+        """Un PDF corrupto con firma %PDF debe lanzar PDFValidationError."""
+        corrupt_pdf = b"%PDF-1.4\n%CorruptContent"
+        with pytest.raises(PDFValidationError, match = "corrupto o no es válido"):
+            service.validate_pdf(corrupt_pdf)
+
+    def test_validate_pdf_empty_bytes(self, service):
+        """Bytes vacíos deben lanzar PDFValidationError."""
+        with pytest.raises(PDFValidationError, match = "firma PDF válida"):
+            service.validate_pdf(b"")
 
 # ── Tests de validación ───────────────────────────────────────────────────────
 class TestValidatePDF:
