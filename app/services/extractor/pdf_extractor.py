@@ -4,7 +4,6 @@ Servicio de extracción de texto desde archivos PDF.
 Principio SRP: esta clase SOLO se encarga de procesar PDFs.
 No persiste datos, no genera resúmenes ni interactúa con la API.
 """
-import hashlib
 import io
 import logging
 import re
@@ -48,7 +47,7 @@ class PDFExtractorService:
             file_bytes: Contenido del PDF como bytes (sin escritura en disco).
 
         Returns:
-            ExtractedDocument con texto, checksum, page_count y metadata.
+            ExtractedDocument con texto, page_count y metadata.
 
         Raises:
             PDFValidationError: Si el archivo no es PDF válido o es demasiado grande.
@@ -88,18 +87,6 @@ class PDFExtractorService:
         except PdfReadError as exc:
             raise PDFValidationError(f"El archivo PDF está corrupto o no es válido: {exc}") from exc
         return True
-
-    def calculate_checksum(self, file_bytes: bytes) -> str:
-        """
-        Calcula el checksum SHA-256 del archivo.
-
-        Args:
-            file_bytes: Contenido del archivo.
-
-        Returns:
-            Hash SHA-256 en formato hexadecimal (64 caracteres).
-        """
-        return hashlib.sha256(file_bytes).hexdigest()
 
     def extract_text(self, file_bytes: bytes) -> str:
         """
