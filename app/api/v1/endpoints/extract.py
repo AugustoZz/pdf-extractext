@@ -12,6 +12,7 @@ from pymongo.errors import DuplicateKeyError
 from app.core.config import settings
 from app.infrastructure.database.repository import DocumentRepository
 from app.services.extractor import PDFExtractorService, PDFValidationError
+from app.services.checksum import calculate_checksum
 
 router = APIRouter()
 _service = PDFExtractorService(max_file_size_mb=settings.MAX_FILE_SIZE_MB)
@@ -61,7 +62,7 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
     file_bytes = await file.read()
 
     # 1. Calcular el checksum antes de extraer para evitar proceso innecesario si ya existe
-    checksum = _service.calculate_checksum(file_bytes)
+    checksum = calculate_checksum(file_bytes)
 
     # 2. Verificar duplicado en la BD (atajo: evita extraer texto en vano).
     #    La garantía real la da el índice único sobre 'checksum'; ver paso 4.
@@ -79,7 +80,7 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
     data_to_insert = {
         "filename": file.filename,
         "page_count": doc.page_count,
-        "checksum": doc.checksum,
+        "checksum": checksum,
         "metadata": doc.metadata,
         "text": doc.text,
         "created_at": datetime.now(timezone.utc).isoformat()

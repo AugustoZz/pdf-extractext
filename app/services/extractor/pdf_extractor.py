@@ -58,7 +58,6 @@ class PDFExtractorService:
 
         return ExtractedDocument(
             text=self.extract_text(file_bytes),
-            checksum=self.calculate_checksum(file_bytes),
             page_count=len(reader.pages),
             metadata=self.extract_metadata(file_bytes),
         )
