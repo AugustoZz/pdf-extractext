@@ -1,14 +1,24 @@
 """
-Extracción de texto de un PDF en memoria (nunca se escribe a disco).
+Extracción del texto de un PDF como Markdown, en memoria (nunca se escribe a disco).
 
-No sabe nada de HTTP: recibe bytes y devuelve el texto o una PDFValidationError.
+No sabe nada de HTTP: recibe bytes y devuelve el Markdown o una PDFValidationError.
+Usa PyMuPDF (licencia AGPL) a través de pymupdf4llm.
 """
-import io
-import re
 from dataclasses import dataclass
 
-from pypdf import PasswordType, PdfReader
-from pypdf.errors import PdfReadError
+import pymupdf
+import pymupdf4llm
+
+# pymupdf4llm usa por defecto un modelo de IA para analizar el layout: es de 5 a 7
+# veces más lento que pypdf. El conversor clásico, sin tablas, imágenes ni
+# gráficos, es ~2,5 veces más rápido que pypdf y da Markdown (ver #32).
+pymupdf4llm.use_layout(False)
+_MARKDOWN_OPTIONS = {
+    "table_strategy": None,
+    "ignore_images": True,
+    "ignore_graphics": True,
+    "show_progress": False,
+}
 
 
 class PDFValidationError(ValueError):
@@ -22,38 +32,27 @@ class ExtractionResult:
 
 
 def extract(data: bytes) -> ExtractionResult:
-    reader = _open(data)
-    text = "\n".join(page.extract_text() or "" for page in reader.pages)
-    return ExtractionResult(content=_clean_text(text), page_count=len(reader.pages))
+    with _open(data) as doc:
+        content = pymupdf4llm.to_markdown(doc, **_MARKDOWN_OPTIONS)
+        return ExtractionResult(content=content.strip(), page_count=doc.page_count)
 
 
-def _open(data: bytes) -> PdfReader:
-    """Abre el PDF una sola vez, validando firma, integridad y contraseña."""
+def _open(data: bytes) -> pymupdf.Document:
+    """Abre el PDF validando firma, integridad y contraseña."""
     if not data.startswith(b"%PDF"):
         raise PDFValidationError("El archivo no tiene la firma PDF válida (%PDF).")
     try:
-        reader = PdfReader(io.BytesIO(data))
-    except PdfReadError as exc:
+        doc = pymupdf.open(stream=data, filetype="pdf")
+    except pymupdf.FileDataError as exc:
         raise PDFValidationError(f"El archivo PDF está corrupto o no es válido: {exc}") from exc
-    # Los PDFs con restricciones de propietario se abren con contraseña vacía.
-    if reader.is_encrypted and reader.decrypt("") == PasswordType.NOT_DECRYPTED:
+    # PyMuPDF repara lo que puede; si no rescata ninguna página, está corrupto.
+    if doc.page_count == 0:
+        doc.close()
+        raise PDFValidationError("El archivo PDF está corrupto o no es válido: no tiene páginas.")
+    # Los PDFs con restricciones de propietario se abren sin contraseña.
+    if doc.needs_pass:
+        doc.close()
         raise PDFValidationError(
             "El archivo PDF está protegido con contraseña y no se puede procesar."
         )
-    return reader
-
-
-def _clean_text(text: str) -> str:
-    """Corrige artefactos de pypdf preservando la estructura del texto."""
-    # pypdf a veces deja secuencias de escape literales (la barra y la n) en vez
-    # del carácter real.
-    text = text.replace("\\n", "\n").replace("\\r", "\r").replace("\\t", "\t")
-    text = text.replace("\r\n", "\n").replace("\r", "\n")
-    # Caracteres de control no imprimibles; se conservan \n y \t.
-    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
-    # Barras sueltas: artefactos del PDF, el texto real no las usa.
-    text = text.replace("\\", "")
-    text = "\n".join(line.rstrip() for line in text.split("\n"))
-    # Como máximo una línea en blanco entre párrafos.
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text.strip()
+    return doc

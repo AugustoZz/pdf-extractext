@@ -19,6 +19,11 @@ class TestExtract:
         for text in ("Primera", "Segunda", "Tercera"):
             assert text in result.content
 
+    def test_content_is_markdown(self):
+        result = extract(build_pdf("Texto importante", font="Helvetica-Bold"))
+
+        assert "**Texto importante**" in result.content
+
     def test_pdf_without_selectable_text_returns_empty_content(self, blank_pdf):
         result = extract(blank_pdf)
 

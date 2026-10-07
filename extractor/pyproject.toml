@@ -6,8 +6,8 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.29",
-    "pypdf>=4.0",
     "pydantic-settings>=2.0",
+    "pymupdf4llm==1.28.2",
 ]
 
 [dependency-groups]

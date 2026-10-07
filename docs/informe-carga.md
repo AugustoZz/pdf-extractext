@@ -8,8 +8,8 @@ cliente (k6 / Vegeta) ──► extractor-lb (nginx, least_conn) ──► extra
 
 - **extractor-lb:** reparte las peticiones con `least_conn`, porque el tiempo de
   procesamiento varía mucho según el PDF.
-- **extractor:** FastAPI + uvicorn, sin estado. La extracción (pypdf) corre en un pool de
-  procesos separado del event loop. Un control de admisión deja procesar un PDF por vez
+- **extractor:** FastAPI + uvicorn, sin estado. La extracción a Markdown (PyMuPDF vía
+  pymupdf4llm, conversor clásico) corre en un pool de procesos separado del event loop. Un control de admisión deja procesar un PDF por vez
   por réplica (1 CPU) y responde 503 si una petición espera más de `QUEUE_TIMEOUT_S`
   (20 s por defecto).
 
@@ -129,6 +129,41 @@ los 4 oficiales), así que sirve para comparar versiones entre sí, no contra el
   la base y Vegeta mejora.
 - **Conclusión:** se mantiene, con 20 s por defecto. El throughput total casi no cambia:
   el límite sigue siendo la extracción con pypdf, que es lo que ataca #32.
+
+### Experimento 2: librería de extracción (pypdf → PyMuPDF con salida Markdown)
+
+- **Hipótesis:** con el backpressure, el límite pasó a ser la extracción. pypdf está
+  escrita en Python puro; PyMuPDF es una capa sobre MuPDF, escrito en C. Además, la
+  consigna pide Markdown y pypdf sólo da texto plano, a veces muy fragmentado (una palabra
+  por línea en PDFs exportados de Google Docs).
+- **Investigación previa:** mediana de 15 extracciones en un solo hilo, con los PDFs de la
+  cátedra.
+
+  | Opción | Consigna (122 KB) | TP (172 KB) | Markdown |
+  |---|---|---|---|
+  | pypdf | 119 ms | 366 ms | No |
+  | PyMuPDF, texto plano | 7 ms | 13 ms | No |
+  | pypdfium2, texto plano | 8 ms | 26 ms | No |
+  | **pymupdf4llm clásico, sin tablas/imágenes/gráficos** | **44 ms** | **169 ms** | **Sí** |
+  | pymupdf4llm clásico, completo | 612 ms | 1.632 ms | Sí, con tablas |
+  | pymupdf4llm 1.28 por defecto (modelo de layout) | 789 ms | 1.897 ms | Sí |
+
+  El texto plano de PyMuPDF es el más rápido, pero no cumple con el Markdown. Detectar
+  tablas es más del 90 % del costo, y el modo por defecto de pymupdf4llm 1.28 usa un
+  modelo de IA para el layout, que es lo más lento de todo.
+- **Cambio:** pymupdf4llm con `use_layout(False)` y sin tablas, imágenes ni gráficos.
+  Importarlo suma ~64 MB por proceso (el paquete del modelo es dependencia obligatoria
+  aunque no se use). PyMuPDF tiene licencia AGPL.
+
+| Versión | Vegeta éxito | Vegeta req/s efectivas | k6 req/s | k6 error | k6 p50 | k6 p95 | k6 máx |
+|---|---|---|---|---|---|---|---|
+| Backpressure + pypdf | 23,7 % (355) | 6,99 | 7,23 | 0,00 % | 12,05 s | 15,51 s | 17,22 s |
+| **Backpressure + PyMuPDF** | **61,1 % (916)** | **18,21** | **20,18** | **0,00 %** | **4,31 s** | **5,81 s** | **6,48 s** |
+
+- **Resultado:** ~2,8 veces más throughput en los dos modelos de carga y latencias divididas
+  por tres, sin errores en k6 ni timeouts en Vegeta. Cada réplica usa ~170 MB de su 1 GB.
+- **Calidad:** el contenido pasa a ser Markdown real (títulos, negritas, párrafos).
+- **Conclusión:** se mantiene.
 
 ### Experimento N: _(título)_
 
