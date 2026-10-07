@@ -1,7 +1,3 @@
-# Nombre de proyecto propio: sin él, Compose usa el nombre de la carpeta, y otro
-# repo llamado pdf-extractext (por ejemplo, el de otro grupo) pisaría estos contenedores.
-name: pdf-extractext-mansalve-praderio-quiroga
-
 # Los puertos del host son configurables (ver .env.example) por si ya están en uso.
 services:
   api:
