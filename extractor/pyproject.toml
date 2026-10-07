@@ -7,7 +7,7 @@ dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.29",
     "pydantic-settings>=2.0",
-    "pymupdf4llm==1.28.2",
+    "pymupdf==1.28.2",
 ]
 
 [dependency-groups]

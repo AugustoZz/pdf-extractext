@@ -2,23 +2,20 @@
 Extracción del texto de un PDF como Markdown, en memoria (nunca se escribe a disco).
 
 No sabe nada de HTTP: recibe bytes y devuelve el Markdown o una PDFValidationError.
-Usa PyMuPDF (licencia AGPL) a través de pymupdf4llm.
+Usa PyMuPDF (licencia AGPL), con un conversor a Markdown propio y liviano: cada
+bloque de texto es un párrafo, el texto más grande que el cuerpo es un título y
+el texto todo en negrita va entre `**`. pymupdf4llm da un Markdown más rico pero
+es ~14 veces más lento con los PDFs del TP (ver docs/informe-carga.md).
 """
+from collections import Counter
 from dataclasses import dataclass
 
 import pymupdf
-import pymupdf4llm
 
-# pymupdf4llm usa por defecto un modelo de IA para analizar el layout: es de 5 a 7
-# veces más lento que pypdf. El conversor clásico, sin tablas, imágenes ni
-# gráficos, es ~2,5 veces más rápido que pypdf y da Markdown (ver #32).
-pymupdf4llm.use_layout(False)
-_MARKDOWN_OPTIONS = {
-    "table_strategy": None,
-    "ignore_images": True,
-    "ignore_graphics": True,
-    "show_progress": False,
-}
+# A partir de cuántas veces el tamaño del cuerpo un bloque es título (#) o subtítulo (##).
+_HEADING_RATIO = 1.5
+_SUBHEADING_RATIO = 1.2
+_TEXT_FLAGS = pymupdf.TEXT_PRESERVE_WHITESPACE | pymupdf.TEXT_MEDIABOX_CLIP
 
 
 class PDFValidationError(ValueError):
@@ -33,8 +30,13 @@ class ExtractionResult:
 
 def extract(data: bytes) -> ExtractionResult:
     with _open(data) as doc:
-        content = pymupdf4llm.to_markdown(doc, **_MARKDOWN_OPTIONS)
-        return ExtractionResult(content=content.strip(), page_count=doc.page_count)
+        blocks = [
+            spans
+            for page in doc
+            for block in page.get_text("dict", flags=_TEXT_FLAGS, sort=True)["blocks"]
+            if (spans := _text_spans(block))
+        ]
+        return ExtractionResult(content=_to_markdown(blocks), page_count=doc.page_count)
 
 
 def _open(data: bytes) -> pymupdf.Document:
@@ -56,3 +58,27 @@ def _open(data: bytes) -> pymupdf.Document:
             "El archivo PDF está protegido con contraseña y no se puede procesar."
         )
     return doc
+
+
+def _text_spans(block: dict) -> list[dict]:
+    """Fragmentos con texto de un bloque (los bloques de imagen no tienen líneas)."""
+    return [span for line in block.get("lines", []) for span in line["spans"] if span["text"].strip()]
+
+
+def _to_markdown(blocks: list[list[dict]]) -> str:
+    # El cuerpo es el tamaño de letra más usado del documento.
+    sizes = Counter(round(span["size"]) for spans in blocks for span in spans)
+    body_size = sizes.most_common(1)[0][0] if sizes else 0
+    return "\n\n".join(_block_to_markdown(spans, body_size) for spans in blocks)
+
+
+def _block_to_markdown(spans: list[dict], body_size: float) -> str:
+    text = " ".join(span["text"].strip() for span in spans)
+    size = max(span["size"] for span in spans)
+    if size >= body_size * _HEADING_RATIO:
+        return f"# {text}"
+    if size >= body_size * _SUBHEADING_RATIO:
+        return f"## {text}"
+    if all(span["flags"] & pymupdf.TEXT_FONT_BOLD for span in spans):
+        return f"**{text}**"
+    return text
