@@ -6,13 +6,13 @@ verificar lo que extrae el servicio.
 """
 
 
-def build_pdf(*pages: str) -> bytes:
-    """PDF con una página por texto recibido (sólo ASCII, en Helvetica)."""
+def build_pdf(*pages: str, font: str = "Helvetica") -> bytes:
+    """PDF con una página por texto recibido (sólo ASCII)."""
     kids = " ".join(f"{4 + 2 * i} 0 R" for i in range(len(pages)))
     objects = [
         b"<< /Type /Catalog /Pages 2 0 R >>",
         f"<< /Type /Pages /Kids [{kids}] /Count {len(pages)} >>".encode(),
-        b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+        f"<< /Type /Font /Subtype /Type1 /BaseFont /{font} >>".encode(),
     ]
     for i, text in enumerate(pages):
         stream = f"BT /F1 12 Tf 72 720 Td ({text}) Tj ET".encode()
