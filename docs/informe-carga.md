@@ -32,6 +32,8 @@ Decisiones de diseño (cada una justificada con mediciones en la sección 4):
 | Docker | Docker Desktop 29.8.2 (VM con 8 CPUs y 7,6 GB de RAM), Compose 5.5.1 |
 | Límites por réplica | 1.0 CPU, 1 GB RAM |
 | Balanceador | nginx 1.27, 1.0 CPU, 512 MB RAM |
+| Resto del sistema | api (documents-service) 0,5 CPU / 512 MB y MongoDB 0,5 CPU / 1 GB; ociosos durante las pruebas |
+| Generadores de carga | k6 y Vegeta sin límites: no son el sistema medido, y limitarlos falsearía las mediciones |
 | Réplicas | 5 |
 | PDFs | `tests/stress/pdfs` (set oficial de la cátedra) |
 

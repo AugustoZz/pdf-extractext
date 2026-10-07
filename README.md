@@ -139,6 +139,11 @@ El extractor-service se mide con los perfiles del TP de carga, usando **k6** (sp
 falta instalarlos. Desde el host, el extractor responde en `http://localhost:8080/extract`
 (5 réplicas detrás de nginx).
 
+> [!IMPORTANT]
+> Los 4 PDFs oficiales de la cátedra no están en el repo (son material de terceros).
+> Antes de correr las pruebas hay que copiarlos en `tests/stress/pdfs/` con sus nombres
+> originales; la lista está en [`tests/stress/README.md`](tests/stress/README.md#pdfs-de-prueba).
+
 ```bash
 # Con el sistema levantado (docker compose up --build -d)
 docker compose run --rm --service-ports k6
@@ -146,6 +151,9 @@ docker compose run --rm vegeta
 ```
 
 Los resultados quedan en `tests/stress/results/`.
+
+Para usar los scripts de la cátedra en vez de los nuestros, alcanza con apuntarlos a
+`http://localhost:8080/extract` (en el script de k6, `BASE_URL = 'http://localhost:8080'`).
 
 - Cómo correrlas, perfiles y opciones: [`tests/stress/README.md`](tests/stress/README.md)
 - Arquitectura, mediciones y proceso de optimización: [`docs/informe-carga.md`](docs/informe-carga.md)
