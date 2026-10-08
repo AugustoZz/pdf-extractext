@@ -55,7 +55,7 @@ pdf-extractext/
 ├── .env.example                # Variables de entorno requeridas (12-Factor)
 ├── requirements.txt            # Dependencias del proyecto
 ├── Dockerfile                  # Imagen de la aplicación
-├── docker-compose.yml          # Orquestación API + MongoDB
+├── docker-compose.yml          # Orquestación API + MongoDB + extractor
 └── README.md
 ```
 ---
@@ -132,32 +132,21 @@ uv run pytest --cov=app
 
 ---
 
-## Pruebas de carga y estrés
+## Microservicios
 
-El extractor-service se mide con los perfiles del TP de carga, usando **k6** (spike de
-100 VUs) y **Vegeta** (carga fija de 50 req/s). Ambos corren en Docker, así que no hace
-falta instalarlos. Desde el host, el extractor responde en `http://localhost:8080/extract`
-(5 réplicas detrás de nginx).
+Cada microservicio vive en su propio repositorio:
 
-> [!IMPORTANT]
-> Los 4 PDFs oficiales de la cátedra no están en el repo (son material de terceros).
-> Antes de correr las pruebas hay que copiarlos en `tests/stress/pdfs/` con sus nombres
-> originales; la lista está en [`tests/stress/README.md`](tests/stress/README.md#pdfs-de-prueba).
+| Servicio | Repositorio | Qué hace |
+|---|---|---|
+| **api** (documentos) | este repositorio | API REST, frontend y persistencia en MongoDB |
+| **extractor** | [pdf-extractext-extractor](https://github.com/valendotjpg/pdf-extractext-extractor) | Recibe un PDF y devuelve su texto en Markdown |
 
-```bash
-# Con el sistema levantado (docker compose up --build -d)
-docker compose run --rm --service-ports k6
-docker compose run --rm vegeta
-```
+`docker compose up --build` construye el extractor directamente desde su repositorio
+(5 réplicas). Dentro de la red de Compose responde en `http://extractor:8000/extract`.
 
-Los resultados quedan en `tests/stress/results/`.
-
-Para usar los scripts de la cátedra en vez de los nuestros, alcanza con apuntarlos a
-`http://localhost:8080/extract` (en el script de k6, `BASE_URL = 'http://localhost:8080'`).
-
-- Cómo correrlas, perfiles y opciones: [`tests/stress/README.md`](tests/stress/README.md)
-- Arquitectura, mediciones y proceso de optimización: [`docs/informe-carga.md`](docs/informe-carga.md)
-- Contrato del extractor: [`docs/extractor_contract.md`](docs/extractor_contract.md)
+El TP de **Test de Carga, Estrés y Optimización** se entrega en el repositorio del
+extractor: ahí están las pruebas con k6 y Vegeta, el informe, la evidencia de la corrida
+final y el contrato del servicio.
 
 ---
 

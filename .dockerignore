@@ -8,6 +8,3 @@ __pycache__
 .env
 .DS_Store
 *.pdf
-
-# Otro servicio, con su propia imagen (y su .venv local)
-extractor
