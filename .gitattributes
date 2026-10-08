@@ -1,4 +1,0 @@
-# Los scripts y los targets de Vegeta se leen dentro de contenedores Linux:
-# con CRLF, sh falla y Vegeta no encuentra los PDFs.
-*.sh text eol=lf
-tests/stress/vegeta/targets.txt text eol=lf
