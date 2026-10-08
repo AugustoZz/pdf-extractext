@@ -8,3 +8,10 @@ __pycache__
 .env
 .DS_Store
 *.pdf
+.test-extractor
+output
+nginx
+extractor
+**/.venv
+**/venv
+**/__pycache__

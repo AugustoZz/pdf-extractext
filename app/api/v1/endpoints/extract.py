@@ -11,11 +11,16 @@ from pymongo.errors import DuplicateKeyError
 
 from app.core.config import settings
 from app.infrastructure.database.repository import DocumentRepository
-from app.services.extractor import PDFExtractorService, PDFValidationError, PDFTooLargeError
+from app.services.extractor import PDFValidationError, PDFTooLargeError
+from app.services.extractor.http_extractor import HTTPPDFExtractorService, ExtractorHTTPError
 from app.services.checksum import calculate_checksum
 
 router = APIRouter()
-_service = PDFExtractorService(max_file_size_mb=settings.MAX_FILE_SIZE_MB)
+_service = HTTPPDFExtractorService(
+    url=settings.EXTRACTOR_URL,
+    timeout_seconds=settings.EXTRACTOR_TIMEOUT_SECONDS,
+    max_file_size_mb=settings.MAX_FILE_SIZE_MB,
+)
 
 # No se incluye el nombre del archivo: es un dato que elige quien sube el PDF
 # y no tiene sentido devolverlo tal cual en un mensaje de error.
@@ -61,7 +66,9 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
     - **metadata**: metadatos del PDF.
     """
     _validate_upload(file)
-    file_bytes = await file.read()
+    # Nunca leer sin límite: alcanza con un byte extra para detectar exceso.
+    # UploadFile puede representar una entrada mucho mayor que nuestra RAM.
+    file_bytes = await file.read(_MAX_FILE_BYTES + 1)
 
     # 1. Validar tamaño ANTES de hashear: si el archivo es demasiado grande,
     #    no tiene sentido calcular el checksum ni ocupar más memoria.
@@ -82,11 +89,13 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
 
     # 4. Procesar y extraer texto
     try:
-        doc = _service.extract(file_bytes)
+        doc = await _service.extract(file_bytes)
     except PDFTooLargeError as exc:
         raise HTTPException(status_code=413, detail=str(exc)) from exc
     except PDFValidationError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ExtractorHTTPError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
 
     # 5. Guardar en Base de Datos
     data_to_insert = {

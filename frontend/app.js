@@ -87,7 +87,9 @@ function handleFiles(files) {
     if (files.length === 0) return;
     const file = files[0];
     
-    if (file.type !== 'application/pdf') {
+    const mime = (file.type || '').toLowerCase();
+    const allowedMimes = ['application/pdf', '', 'application/octet-stream', 'binary/octet-stream'];
+    if (!file.name.toLowerCase().endsWith('.pdf') || !allowedMimes.includes(mime)) {
         showToast('Por favor, selecciona un archivo PDF válido.', 'error');
         return;
     }
