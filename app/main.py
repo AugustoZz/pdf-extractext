@@ -18,6 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
 from app.api.v1 import router as v1_router
+from app.api.v1.endpoints.extract import _service as extractor_service
 from app.core.config import settings
 from app.infrastructure.database.connection import connect_to_mongo, close_mongo_connection
 from app.infrastructure.database.repository import DocumentRepository
@@ -39,10 +40,16 @@ FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
 async def lifespan(app: FastAPI):
     # Startup
     await connect_to_mongo()
-    await DocumentRepository.ensure_indexes()
-    yield
-    # Shutdown
-    await close_mongo_connection()
+    try:
+        await DocumentRepository.ensure_indexes()
+        await extractor_service.start()
+        yield
+    finally:
+        # También cerrar MongoDB si falla el índice durante el arranque.
+        try:
+            await extractor_service.close()
+        finally:
+            await close_mongo_connection()
 
 # ── Aplicación FastAPI ────────────────────────────────────────────
 app = FastAPI(

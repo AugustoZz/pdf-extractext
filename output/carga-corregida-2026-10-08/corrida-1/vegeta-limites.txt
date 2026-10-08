@@ -1,0 +1,1 @@
+/carga-vegeta-corregida-1 CPU=1000000000 MEM=1073741824 OOM=false

@@ -145,3 +145,8 @@ migrations/
 
 # Snyk Security Extension - AI Rules (auto-generated)
 .github/instructions/snyk_rules.instructions.md
+
+# Checkout local del repositorio independiente del extractor.
+/.test-extractor/
+# Binarios de Vegeta: se conservan localmente; publicar JSON/HTML y el parche.
+/output/**/*.bin

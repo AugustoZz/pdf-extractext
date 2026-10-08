@@ -1,0 +1,227 @@
+{
+    "Id":  "41ff265cf55b020efa96eb4aa60b0bd404d345889175bdb8f3b85edde3dd152a",
+    "Created":  "2026-10-08T20:45:58.652394312Z",
+    "Path":  "sh",
+    "Args":  [
+                 "/stress/profesor/run.sh"
+             ],
+    "State":  {
+                  "Status":  "exited",
+                  "Running":  false,
+                  "Paused":  false,
+                  "Restarting":  false,
+                  "OOMKilled":  false,
+                  "Dead":  false,
+                  "Pid":  0,
+                  "ExitCode":  0,
+                  "Error":  "",
+                  "StartedAt":  "2026-10-08T20:45:58.798334165Z",
+                  "FinishedAt":  "2026-10-08T20:46:42.590293897Z"
+              },
+    "Image":  "sha256:ea2ec341ec73c39998861c85bfd77343962d947fd2a6bd952a185b32ff850a5a",
+    "ResolvConfPath":  "/var/lib/docker/containers/41ff265cf55b020efa96eb4aa60b0bd404d345889175bdb8f3b85edde3dd152a/resolv.conf",
+    "HostnamePath":  "/var/lib/docker/containers/41ff265cf55b020efa96eb4aa60b0bd404d345889175bdb8f3b85edde3dd152a/hostname",
+    "HostsPath":  "/var/lib/docker/containers/41ff265cf55b020efa96eb4aa60b0bd404d345889175bdb8f3b85edde3dd152a/hosts",
+    "LogPath":  "",
+    "Name":  "/carga-vegeta-72c49993",
+    "RestartCount":  0,
+    "Driver":  "overlayfs",
+    "Platform":  "linux",
+    "MountLabel":  "",
+    "ProcessLabel":  "",
+    "AppArmorProfile":  "",
+    "ExecIDs":  null,
+    "HostConfig":  {
+                       "Binds":  [
+                                     "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress:/stress:rw"
+                                 ],
+                       "ContainerIDFile":  "",
+                       "LogConfig":  {
+                                         "Type":  "local",
+                                         "Config":  {
+
+                                                    }
+                                     },
+                       "NetworkMode":  "carga-local_default",
+                       "PortBindings":  {
+
+                                        },
+                       "RestartPolicy":  {
+                                             "Name":  "no",
+                                             "MaximumRetryCount":  0
+                                         },
+                       "AutoRemove":  false,
+                       "VolumeDriver":  "",
+                       "VolumesFrom":  null,
+                       "ConsoleSize":  [
+                                           0,
+                                           0
+                                       ],
+                       "CapAdd":  null,
+                       "CapDrop":  null,
+                       "CgroupnsMode":  "private",
+                       "Dns":  null,
+                       "DnsOptions":  null,
+                       "DnsSearch":  null,
+                       "ExtraHosts":  [
+                                          "host.docker.internal:172.19.0.1"
+                                      ],
+                       "GroupAdd":  null,
+                       "IpcMode":  "private",
+                       "Cgroup":  "",
+                       "Links":  null,
+                       "OomScoreAdj":  0,
+                       "PidMode":  "",
+                       "Privileged":  false,
+                       "PublishAllPorts":  false,
+                       "ReadonlyRootfs":  false,
+                       "SecurityOpt":  null,
+                       "UTSMode":  "",
+                       "UsernsMode":  "",
+                       "ShmSize":  67108864,
+                       "Runtime":  "runc",
+                       "Isolation":  "",
+                       "CpuShares":  0,
+                       "Memory":  1073741824,
+                       "NanoCpus":  1000000000,
+                       "CgroupParent":  "",
+                       "BlkioWeight":  0,
+                       "BlkioWeightDevice":  null,
+                       "BlkioDeviceReadBps":  null,
+                       "BlkioDeviceWriteBps":  null,
+                       "BlkioDeviceReadIOps":  null,
+                       "BlkioDeviceWriteIOps":  null,
+                       "CpuPeriod":  0,
+                       "CpuQuota":  0,
+                       "CpuRealtimePeriod":  0,
+                       "CpuRealtimeRuntime":  0,
+                       "CpusetCpus":  "",
+                       "CpusetMems":  "",
+                       "Devices":  null,
+                       "DeviceCgroupRules":  null,
+                       "DeviceRequests":  null,
+                       "MemoryReservation":  0,
+                       "MemorySwap":  2147483648,
+                       "MemorySwappiness":  null,
+                       "OomKillDisable":  null,
+                       "PidsLimit":  null,
+                       "Ulimits":  null,
+                       "CpuCount":  0,
+                       "CpuPercent":  0,
+                       "IOMaximumIOps":  0,
+                       "IOMaximumBandwidth":  0,
+                       "MaskedPaths":  [
+                                           "/proc/acpi",
+                                           "/proc/asound",
+                                           "/proc/interrupts",
+                                           "/proc/kcore",
+                                           "/proc/keys",
+                                           "/proc/latency_stats",
+                                           "/proc/sched_debug",
+                                           "/proc/scsi",
+                                           "/proc/timer_list",
+                                           "/proc/timer_stats",
+                                           "/sys/devices/virtual/powercap",
+                                           "/sys/firmware"
+                                       ],
+                       "ReadonlyPaths":  [
+                                             "/proc/bus",
+                                             "/proc/fs",
+                                             "/proc/irq",
+                                             "/proc/sys",
+                                             "/proc/sysrq-trigger"
+                                         ]
+                   },
+    "Storage":  {
+                    "RootFS":  {
+                                   "Snapshot":  {
+                                                    "Name":  "overlayfs"
+                                                }
+                               }
+                },
+    "Mounts":  [
+                   {
+                       "Type":  "bind",
+                       "Source":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress",
+                       "Destination":  "/stress",
+                       "Mode":  "rw",
+                       "RW":  true,
+                       "Propagation":  "rprivate"
+                   }
+               ],
+    "Config":  {
+                   "Hostname":  "41ff265cf55b",
+                   "Domainname":  "",
+                   "User":  "",
+                   "AttachStdin":  true,
+                   "AttachStdout":  true,
+                   "AttachStderr":  true,
+                   "Tty":  false,
+                   "OpenStdin":  true,
+                   "StdinOnce":  true,
+                   "Env":  [
+                               "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+                           ],
+                   "Cmd":  [
+                               "/stress/profesor/run.sh"
+                           ],
+                   "Image":  "carga-local-vegeta",
+                   "Volumes":  null,
+                   "WorkingDir":  "/",
+                   "Entrypoint":  [
+                                      "sh"
+                                  ],
+                   "Labels":  {
+                                  "com.docker.compose.config-hash":  "bf40c56b4c0fcba3394d630500468fa4fd840ee0373891a849379f78f6a42767",
+                                  "com.docker.compose.depends_on":  "extractor-lb:service_started:false",
+                                  "com.docker.compose.image":  "sha256:174ce525c4e7463a21e82d25d8fd3575571b0842d14c1e4ee45308c0b7f2a925",
+                                  "com.docker.compose.oneoff":  "True",
+                                  "com.docker.compose.project":  "carga-local",
+                                  "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                  "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                  "com.docker.compose.service":  "vegeta",
+                                  "com.docker.compose.slug":  "880bd4ce8cc00c26216f73d309ddfe150574b969e0a8c6f86fd1d4e17bd73a3a",
+                                  "com.docker.compose.version":  "5.5.1"
+                              }
+               },
+    "NetworkSettings":  {
+                            "SandboxID":  "",
+                            "SandboxKey":  "",
+                            "Ports":  {
+
+                                      },
+                            "Networks":  {
+                                             "carga-local_default":  {
+                                                                         "IPAMConfig":  null,
+                                                                         "Links":  null,
+                                                                         "Aliases":  [
+                                                                                         "carga-vegeta-72c49993"
+                                                                                     ],
+                                                                         "DriverOpts":  null,
+                                                                         "GwPriority":  0,
+                                                                         "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                         "EndpointID":  "",
+                                                                         "Gateway":  "",
+                                                                         "IPAddress":  "",
+                                                                         "MacAddress":  "",
+                                                                         "IPPrefixLen":  0,
+                                                                         "IPv6Gateway":  "",
+                                                                         "GlobalIPv6Address":  "",
+                                                                         "GlobalIPv6PrefixLen":  0,
+                                                                         "DNSNames":  [
+                                                                                          "carga-vegeta-72c49993",
+                                                                                          "41ff265cf55b"
+                                                                                      ]
+                                                                     }
+                                         }
+                        },
+    "ImageManifestDescriptor":  {
+                                    "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                    "digest":  "sha256:174ce525c4e7463a21e82d25d8fd3575571b0842d14c1e4ee45308c0b7f2a925",
+                                    "size":  672,
+                                    "platform":  {
+                                                     "architecture":  "amd64",
+                                                     "os":  "linux"
+                                                 }
+                                }
+}

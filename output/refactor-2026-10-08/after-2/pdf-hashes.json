@@ -1,0 +1,18 @@
+[
+    {
+        "Path":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress\\pdfs\\2020-Scrum-Guide-Spanish-Latin-South-American.pdf",
+        "Hash":  "6BBFF3F361E52016CBB75A72671F1B31B5E043FDC1CC3F022F1B15A32795A256"
+    },
+    {
+        "Path":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress\\pdfs\\Essential-Kanban-Condensed-Spanish.pdf",
+        "Hash":  "257F73B908420AC5C78852FB8673BEB683A8CA0C05D2E6A82B5E9629F6AD7BE8"
+    },
+    {
+        "Path":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress\\pdfs\\Filosofia Lean.pdf",
+        "Hash":  "C77B55BD68477ECC0D96074EA4606BFFE5802A1C8A241A725F6EB358BE17CE40"
+    },
+    {
+        "Path":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress\\pdfs\\scrum_manager_historias_usuario.pdf",
+        "Hash":  "30EFD6FCD0C022665676EDCF164FEB28E6B43DCCE53AB9738550B99D70F5FD84"
+    }
+]

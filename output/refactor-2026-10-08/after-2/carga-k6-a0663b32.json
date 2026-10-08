@@ -1,0 +1,249 @@
+{
+    "Id":  "0d7e043c9ffb9012e8f911744cba7cff30713adf6f3286ef08567b108d5d3cdc",
+    "Created":  "2026-10-08T20:46:59.21936567Z",
+    "Path":  "k6",
+    "Args":  [
+                 "run",
+                 "--out",
+                 "web-dashboard",
+                 "--summary-export=/stress/results/corregido-k6.json",
+                 "/stress/profesor/spike_tests.js"
+             ],
+    "State":  {
+                  "Status":  "exited",
+                  "Running":  false,
+                  "Paused":  false,
+                  "Restarting":  false,
+                  "OOMKilled":  false,
+                  "Dead":  false,
+                  "Pid":  0,
+                  "ExitCode":  0,
+                  "Error":  "",
+                  "StartedAt":  "2026-10-08T20:46:59.305894125Z",
+                  "FinishedAt":  "2026-10-08T20:47:41.264163305Z"
+              },
+    "Image":  "sha256:9c2dee7f8ed74d317e4027c06a10f169b625638189de8d4555d0b3486a5aeb34",
+    "ResolvConfPath":  "/var/lib/docker/containers/0d7e043c9ffb9012e8f911744cba7cff30713adf6f3286ef08567b108d5d3cdc/resolv.conf",
+    "HostnamePath":  "/var/lib/docker/containers/0d7e043c9ffb9012e8f911744cba7cff30713adf6f3286ef08567b108d5d3cdc/hostname",
+    "HostsPath":  "/var/lib/docker/containers/0d7e043c9ffb9012e8f911744cba7cff30713adf6f3286ef08567b108d5d3cdc/hosts",
+    "LogPath":  "",
+    "Name":  "/carga-k6-a0663b32",
+    "RestartCount":  0,
+    "Driver":  "overlayfs",
+    "Platform":  "linux",
+    "MountLabel":  "",
+    "ProcessLabel":  "",
+    "AppArmorProfile":  "",
+    "ExecIDs":  null,
+    "HostConfig":  {
+                       "Binds":  [
+                                     "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress:/stress:rw"
+                                 ],
+                       "ContainerIDFile":  "",
+                       "LogConfig":  {
+                                         "Type":  "local",
+                                         "Config":  {
+
+                                                    }
+                                     },
+                       "NetworkMode":  "carga-local_default",
+                       "PortBindings":  {
+                                            "5665/tcp":  [
+                                                             {
+                                                                 "HostIp":  "",
+                                                                 "HostPort":  "5665"
+                                                             }
+                                                         ]
+                                        },
+                       "RestartPolicy":  {
+                                             "Name":  "no",
+                                             "MaximumRetryCount":  0
+                                         },
+                       "AutoRemove":  false,
+                       "VolumeDriver":  "",
+                       "VolumesFrom":  null,
+                       "ConsoleSize":  [
+                                           0,
+                                           0
+                                       ],
+                       "CapAdd":  null,
+                       "CapDrop":  null,
+                       "CgroupnsMode":  "private",
+                       "Dns":  null,
+                       "DnsOptions":  null,
+                       "DnsSearch":  null,
+                       "ExtraHosts":  [
+                                          "extract.universidad.localhost:172.19.0.1"
+                                      ],
+                       "GroupAdd":  null,
+                       "IpcMode":  "private",
+                       "Cgroup":  "",
+                       "Links":  null,
+                       "OomScoreAdj":  0,
+                       "PidMode":  "",
+                       "Privileged":  false,
+                       "PublishAllPorts":  false,
+                       "ReadonlyRootfs":  false,
+                       "SecurityOpt":  null,
+                       "UTSMode":  "",
+                       "UsernsMode":  "",
+                       "ShmSize":  67108864,
+                       "Runtime":  "runc",
+                       "Isolation":  "",
+                       "CpuShares":  0,
+                       "Memory":  3221225472,
+                       "NanoCpus":  2000000000,
+                       "CgroupParent":  "",
+                       "BlkioWeight":  0,
+                       "BlkioWeightDevice":  null,
+                       "BlkioDeviceReadBps":  null,
+                       "BlkioDeviceWriteBps":  null,
+                       "BlkioDeviceReadIOps":  null,
+                       "BlkioDeviceWriteIOps":  null,
+                       "CpuPeriod":  0,
+                       "CpuQuota":  0,
+                       "CpuRealtimePeriod":  0,
+                       "CpuRealtimeRuntime":  0,
+                       "CpusetCpus":  "",
+                       "CpusetMems":  "",
+                       "Devices":  null,
+                       "DeviceCgroupRules":  null,
+                       "DeviceRequests":  null,
+                       "MemoryReservation":  0,
+                       "MemorySwap":  6442450944,
+                       "MemorySwappiness":  null,
+                       "OomKillDisable":  null,
+                       "PidsLimit":  null,
+                       "Ulimits":  null,
+                       "CpuCount":  0,
+                       "CpuPercent":  0,
+                       "IOMaximumIOps":  0,
+                       "IOMaximumBandwidth":  0,
+                       "MaskedPaths":  [
+                                           "/proc/acpi",
+                                           "/proc/asound",
+                                           "/proc/interrupts",
+                                           "/proc/kcore",
+                                           "/proc/keys",
+                                           "/proc/latency_stats",
+                                           "/proc/sched_debug",
+                                           "/proc/scsi",
+                                           "/proc/timer_list",
+                                           "/proc/timer_stats",
+                                           "/sys/devices/virtual/powercap",
+                                           "/sys/firmware"
+                                       ],
+                       "ReadonlyPaths":  [
+                                             "/proc/bus",
+                                             "/proc/fs",
+                                             "/proc/irq",
+                                             "/proc/sys",
+                                             "/proc/sysrq-trigger"
+                                         ]
+                   },
+    "Storage":  {
+                    "RootFS":  {
+                                   "Snapshot":  {
+                                                    "Name":  "overlayfs"
+                                                }
+                               }
+                },
+    "Mounts":  [
+                   {
+                       "Type":  "bind",
+                       "Source":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress",
+                       "Destination":  "/stress",
+                       "Mode":  "rw",
+                       "RW":  true,
+                       "Propagation":  "rprivate"
+                   }
+               ],
+    "Config":  {
+                   "Hostname":  "0d7e043c9ffb",
+                   "Domainname":  "",
+                   "User":  "12345",
+                   "AttachStdin":  true,
+                   "AttachStdout":  true,
+                   "AttachStderr":  true,
+                   "ExposedPorts":  {
+                                        "5665/tcp":  {
+
+                                                     }
+                                    },
+                   "Tty":  false,
+                   "OpenStdin":  true,
+                   "StdinOnce":  true,
+                   "Env":  [
+                               "K6_WEB_DASHBOARD_EXPORT=/stress/results/corregido-k6.html",
+                               "GOMEMLIMIT=1GiB",
+                               "SSL_CERT_FILE=/stress/tls/ca.pem",
+                               "K6_WEB_DASHBOARD=false",
+                               "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+                           ],
+                   "Cmd":  [
+                               "run",
+                               "--out",
+                               "web-dashboard",
+                               "--summary-export=/stress/results/corregido-k6.json",
+                               "/stress/profesor/spike_tests.js"
+                           ],
+                   "Image":  "grafana/k6:2.3.0",
+                   "Volumes":  null,
+                   "WorkingDir":  "/home/k6",
+                   "Entrypoint":  [
+                                      "k6"
+                                  ],
+                   "Labels":  {
+                                  "com.docker.compose.config-hash":  "9717739d65332c68342af4bfa6b8b239f1530be8393a3c21bdbaa8dc8379a6bb",
+                                  "com.docker.compose.depends_on":  "extractor-lb:service_started:false",
+                                  "com.docker.compose.image":  "sha256:98305727d160c065e1da695619c40ea4becbc3e116a3842da2d6027970e428c2",
+                                  "com.docker.compose.oneoff":  "True",
+                                  "com.docker.compose.project":  "carga-local",
+                                  "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                  "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                  "com.docker.compose.service":  "k6",
+                                  "com.docker.compose.slug":  "4d4587c5fc9dce9ae508d142afcf3fcf6d739885afc5fe4c1e2d9f20384ce379",
+                                  "com.docker.compose.version":  "5.5.1"
+                              }
+               },
+    "NetworkSettings":  {
+                            "SandboxID":  "",
+                            "SandboxKey":  "",
+                            "Ports":  {
+
+                                      },
+                            "Networks":  {
+                                             "carga-local_default":  {
+                                                                         "IPAMConfig":  null,
+                                                                         "Links":  null,
+                                                                         "Aliases":  [
+                                                                                         "carga-k6-a0663b32"
+                                                                                     ],
+                                                                         "DriverOpts":  null,
+                                                                         "GwPriority":  0,
+                                                                         "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                         "EndpointID":  "",
+                                                                         "Gateway":  "",
+                                                                         "IPAddress":  "",
+                                                                         "MacAddress":  "",
+                                                                         "IPPrefixLen":  0,
+                                                                         "IPv6Gateway":  "",
+                                                                         "GlobalIPv6Address":  "",
+                                                                         "GlobalIPv6PrefixLen":  0,
+                                                                         "DNSNames":  [
+                                                                                          "carga-k6-a0663b32",
+                                                                                          "0d7e043c9ffb"
+                                                                                      ]
+                                                                     }
+                                         }
+                        },
+    "ImageManifestDescriptor":  {
+                                    "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                    "digest":  "sha256:98305727d160c065e1da695619c40ea4becbc3e116a3842da2d6027970e428c2",
+                                    "size":  1049,
+                                    "platform":  {
+                                                     "architecture":  "amd64",
+                                                     "os":  "linux"
+                                                 }
+                                }
+}

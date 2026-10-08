@@ -1,0 +1,2 @@
+/carga-k6-linux-2 EXIT=0 OOM=false CPU=2000000000 RAM=3221225472 HOSTS=["extract.universidad.localhost:172.19.0.1"]
+/carga-vegeta-linux-2 EXIT=0 OOM=false CPU=1000000000 RAM=1073741824 HOSTS=["host.docker.internal:172.19.0.1"]

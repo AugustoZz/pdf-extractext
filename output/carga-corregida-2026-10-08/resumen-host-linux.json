@@ -1,0 +1,38 @@
+[
+    {
+        "run":  1,
+        "route":  "published-ports-linux-host",
+        "k6_requests":  1529,
+        "k6_req_s":  38.16804949438009,
+        "k6_error_rate":  0,
+        "k6_vus_max":  100,
+        "k6_p50_s":  2.323745874,
+        "k6_p95_s":  2.8664963427999996,
+        "k6_sending_mean_s":  0.006570942833878348,
+        "vegeta_requests":  1500,
+        "vegeta_rate":  50.032419174770965,
+        "vegeta_throughput":  34.64150566807242,
+        "vegeta_success":  1,
+        "vegeta_p50_s":  6.643482549,
+        "vegeta_p95_s":  12.240475075,
+        "vegeta_max_s":  18.26687585
+    },
+    {
+        "run":  2,
+        "route":  "published-ports-linux-host",
+        "k6_requests":  1508,
+        "k6_req_s":  37.665130972041034,
+        "k6_error_rate":  0,
+        "k6_vus_max":  100,
+        "k6_p50_s":  2.3292992065,
+        "k6_p95_s":  2.979526514699999,
+        "k6_sending_mean_s":  0.00667593379310344,
+        "vegeta_requests":  1500,
+        "vegeta_rate":  50.03332916019233,
+        "vegeta_throughput":  34.66997200786539,
+        "vegeta_success":  1,
+        "vegeta_p50_s":  6.575626876,
+        "vegeta_p95_s":  11.577762875,
+        "vegeta_max_s":  18.80287843
+    }
+]

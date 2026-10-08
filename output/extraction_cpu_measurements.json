@@ -1,0 +1,46 @@
+{
+  "resources": {"cpu": 1, "memory": "1 GB"},
+  "method": "One warmup and seven measured independent extractions per PDF; median seconds. Baseline image and optimized bind-mounted source. No extraction result cache.",
+  "markdown_exactly_equal": true,
+  "measurements": [
+    {
+      "pdf": "2020-Scrum-Guide-Spanish-Latin-South-American.pdf",
+      "pages": 16,
+      "characters": 35109,
+      "content_sha256": "0e805ff0995576a9f3bee63aa263394d99602ff80fa5a251c6cd81abbf9119c5",
+      "baseline_median_seconds": 0.03737295899986748,
+      "optimized_median_seconds": 0.036603374999913285
+    },
+    {
+      "pdf": "Essential-Kanban-Condensed-Spanish.pdf",
+      "pages": 90,
+      "characters": 124259,
+      "content_sha256": "6dc76f24efc8e4689925db4cd73669117e80c974e771d2f6d474d6f2a6573da9",
+      "baseline_median_seconds": 0.1334657260001677,
+      "optimized_median_seconds": 0.13179739299994253
+    },
+    {
+      "pdf": "Filosofia Lean.pdf",
+      "pages": 42,
+      "characters": 58765,
+      "content_sha256": "1ac6231f734ee2d2d8a6763c71ba471aee40b62ae7300e3e24e1ed93bec4feed",
+      "baseline_median_seconds": 0.0883656239998345,
+      "optimized_median_seconds": 0.08630457000003844
+    },
+    {
+      "pdf": "scrum_manager_historias_usuario.pdf",
+      "pages": 62,
+      "characters": 90289,
+      "content_sha256": "c55f9ae6cb9dc7d3fd2cc0c01fd8f915af6d34a39ce4b19aca54968ee2a94caf",
+      "baseline_median_seconds": 0.08994379399996433,
+      "optimized_median_seconds": 0.08353023700010453
+    }
+  ],
+  "profiling_one_cycle_of_four_pdfs": {
+    "baseline_calls": 107745,
+    "optimized_calls": 69449,
+    "baseline_seconds": 0.392,
+    "optimized_seconds": 0.364
+  },
+  "tests": {"file": ".test-extractor/tests/test_pdf_extractor.py", "passed": 13}
+}

@@ -1,0 +1,45 @@
+[
+  {
+    "run": "before",
+    "limits_and_observed_profiles": true,
+    "all_http_200": true
+  },
+  {
+    "run": "after-1",
+    "limits_and_observed_profiles": true,
+    "all_http_200": true
+  },
+  {
+    "run": "after-2",
+    "limits_and_observed_profiles": true,
+    "all_http_200": true
+  },
+  {
+    "pdf": "2020-Scrum-Guide-Spanish-Latin-South-American.pdf",
+    "official_input_hash": true,
+    "identical_markdown_and_pages": true
+  },
+  {
+    "pdf": "Essential-Kanban-Condensed-Spanish.pdf",
+    "official_input_hash": true,
+    "identical_markdown_and_pages": true
+  },
+  {
+    "pdf": "Filosofia Lean.pdf",
+    "official_input_hash": true,
+    "identical_markdown_and_pages": true
+  },
+  {
+    "pdf": "scrum_manager_historias_usuario.pdf",
+    "official_input_hash": true,
+    "identical_markdown_and_pages": true
+  },
+  {
+    "restored_endpoint": "http://extractor-lb/health",
+    "status": 200
+  },
+  {
+    "restored_endpoint": "http://127.0.0.1:8000/web/index.html",
+    "status": 200
+  }
+]

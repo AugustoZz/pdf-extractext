@@ -7,7 +7,8 @@ from unittest.mock import AsyncMock, patch, MagicMock
 from pymongo.errors import DuplicateKeyError
 
 from app.main import app
-from app.services.extractor import PDFValidationError
+from app.services.extractor import PDFValidationError, PDFTooLargeError
+from app.services.extractor.http_extractor import ExtractorHTTPError
 from app.services.extractor.models import ExtractedDocument
 
 client = TestClient(app)
@@ -25,6 +26,7 @@ def mock_repo():
 @pytest.fixture
 def mock_service():
     with patch("app.api.v1.endpoints.extract._service") as mock:
+        mock.extract = AsyncMock()
         yield mock
 
 def test_extract_pdf_duplicate_checksum(mock_repo, mock_checksum):
@@ -62,6 +64,43 @@ def test_extract_pdf_success_saves_to_db(mock_repo, mock_service, mock_checksum)
     assert response.json()["checksum"] == "newchecksum123"
     inserted=mock_repo.create.call_args[0][0]
     assert inserted["checksum"] == "newchecksum123"
+
+
+@pytest.mark.asyncio
+async def test_upload_read_is_bounded_before_hashing():
+    from app.api.v1.endpoints.extract import extract_pdf, _MAX_FILE_BYTES
+    from fastapi import HTTPException
+
+    upload = MagicMock(filename="large.pdf", content_type="application/pdf")
+    upload.read = AsyncMock(return_value=b"x" * (_MAX_FILE_BYTES + 1))
+    with patch("app.api.v1.endpoints.extract.calculate_checksum") as checksum:
+        with pytest.raises(HTTPException) as exc:
+            await extract_pdf(upload)
+    assert exc.value.status_code == 413
+    upload.read.assert_awaited_once_with(_MAX_FILE_BYTES + 1)
+    checksum.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "error,status",
+    [
+        (PDFValidationError("PDF inválido"), 422),
+        (PDFTooLargeError("PDF demasiado grande"), 413),
+        (ExtractorHTTPError("Extractor saturado"), 503),
+        (ExtractorHTTPError("Respuesta inválida", 502), 502),
+    ],
+)
+def test_extract_propagates_upstream_errors(mock_repo, mock_service, mock_checksum, error, status):
+    mock_checksum.return_value = "errorchecksum"
+    mock_repo.get_by_checksum = AsyncMock(return_value=None)
+    mock_repo.create = AsyncMock()
+    mock_service.extract.side_effect = error
+    response = client.post(
+        "/api/v1/extract",
+        files={"file": ("test.pdf", b"%PDF-1.4...", "application/pdf")},
+    )
+    assert response.status_code == status
+    mock_repo.create.assert_not_awaited()
 
 def test_extract_pdf_concurrent_duplicate_returns_409(mock_repo, mock_service, mock_checksum):
     """

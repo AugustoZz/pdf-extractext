@@ -1,0 +1,6 @@
+/carga-local-extractor-1 CPU=1000000000 RAM=1073741824 PORTS={}
+/carga-local-extractor-2 CPU=1000000000 RAM=1073741824 PORTS={}
+/carga-local-extractor-3 CPU=1000000000 RAM=1073741824 PORTS={}
+/carga-local-extractor-4 CPU=1000000000 RAM=1073741824 PORTS={}
+/carga-local-extractor-5 CPU=1000000000 RAM=1073741824 PORTS={}
+/carga-local-extractor-lb-1 CPU=1000000000 RAM=536870912 PORTS={"443/tcp":[{"HostIp":"","HostPort":"443"}],"80/tcp":[{"HostIp":"","HostPort":"8080"}]}

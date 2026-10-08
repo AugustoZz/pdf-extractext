@@ -1,0 +1,1781 @@
+[
+    {
+        "Id":  "270d12dfcd5e439181650264c3aca7d849cb4562079bf52a36c032e93a4c591c",
+        "Created":  "2026-10-08T16:59:39.968415036Z",
+        "Path":  "/docker-entrypoint.sh",
+        "Args":  [
+                     "nginx",
+                     "-g",
+                     "daemon off;"
+                 ],
+        "State":  {
+                      "Status":  "running",
+                      "Running":  true,
+                      "Paused":  false,
+                      "Restarting":  false,
+                      "OOMKilled":  false,
+                      "Dead":  false,
+                      "Pid":  11128,
+                      "ExitCode":  0,
+                      "Error":  "",
+                      "StartedAt":  "2026-10-08T20:44:34.286062523Z",
+                      "FinishedAt":  "2026-10-08T20:44:33.94780272Z"
+                  },
+        "Image":  "sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10",
+        "ResolvConfPath":  "/var/lib/docker/containers/270d12dfcd5e439181650264c3aca7d849cb4562079bf52a36c032e93a4c591c/resolv.conf",
+        "HostnamePath":  "/var/lib/docker/containers/270d12dfcd5e439181650264c3aca7d849cb4562079bf52a36c032e93a4c591c/hostname",
+        "HostsPath":  "/var/lib/docker/containers/270d12dfcd5e439181650264c3aca7d849cb4562079bf52a36c032e93a4c591c/hosts",
+        "LogPath":  "",
+        "Name":  "/carga-local-extractor-lb-1",
+        "RestartCount":  0,
+        "Driver":  "overlayfs",
+        "Platform":  "linux",
+        "MountLabel":  "",
+        "ProcessLabel":  "",
+        "AppArmorProfile":  "",
+        "ExecIDs":  null,
+        "HostConfig":  {
+                           "Binds":  [
+                                         "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\nginx\\profesor.conf:/etc/nginx/nginx.conf:ro",
+                                         "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress\\tls:/etc/nginx/tls:ro"
+                                     ],
+                           "ContainerIDFile":  "",
+                           "LogConfig":  {
+                                             "Type":  "local",
+                                             "Config":  {
+
+                                                        }
+                                         },
+                           "NetworkMode":  "carga-local_default",
+                           "PortBindings":  {
+                                                "443/tcp":  [
+                                                                {
+                                                                    "HostIp":  "",
+                                                                    "HostPort":  "443"
+                                                                }
+                                                            ],
+                                                "80/tcp":  [
+                                                               {
+                                                                   "HostIp":  "",
+                                                                   "HostPort":  "8080"
+                                                               }
+                                                           ]
+                                            },
+                           "RestartPolicy":  {
+                                                 "Name":  "unless-stopped",
+                                                 "MaximumRetryCount":  0
+                                             },
+                           "AutoRemove":  false,
+                           "VolumeDriver":  "",
+                           "VolumesFrom":  null,
+                           "ConsoleSize":  [
+                                               0,
+                                               0
+                                           ],
+                           "CapAdd":  null,
+                           "CapDrop":  null,
+                           "CgroupnsMode":  "private",
+                           "Dns":  [
+
+                                   ],
+                           "DnsOptions":  [
+
+                                          ],
+                           "DnsSearch":  [
+
+                                         ],
+                           "ExtraHosts":  [
+
+                                          ],
+                           "GroupAdd":  null,
+                           "IpcMode":  "private",
+                           "Cgroup":  "",
+                           "Links":  null,
+                           "OomScoreAdj":  0,
+                           "PidMode":  "",
+                           "Privileged":  false,
+                           "PublishAllPorts":  false,
+                           "ReadonlyRootfs":  false,
+                           "SecurityOpt":  null,
+                           "UTSMode":  "",
+                           "UsernsMode":  "",
+                           "ShmSize":  67108864,
+                           "Runtime":  "runc",
+                           "Isolation":  "",
+                           "CpuShares":  0,
+                           "Memory":  536870912,
+                           "NanoCpus":  1000000000,
+                           "CgroupParent":  "",
+                           "BlkioWeight":  0,
+                           "BlkioWeightDevice":  null,
+                           "BlkioDeviceReadBps":  null,
+                           "BlkioDeviceWriteBps":  null,
+                           "BlkioDeviceReadIOps":  null,
+                           "BlkioDeviceWriteIOps":  null,
+                           "CpuPeriod":  0,
+                           "CpuQuota":  0,
+                           "CpuRealtimePeriod":  0,
+                           "CpuRealtimeRuntime":  0,
+                           "CpusetCpus":  "",
+                           "CpusetMems":  "",
+                           "Devices":  null,
+                           "DeviceCgroupRules":  null,
+                           "DeviceRequests":  null,
+                           "MemoryReservation":  0,
+                           "MemorySwap":  1073741824,
+                           "MemorySwappiness":  null,
+                           "OomKillDisable":  null,
+                           "PidsLimit":  null,
+                           "Ulimits":  null,
+                           "CpuCount":  0,
+                           "CpuPercent":  0,
+                           "IOMaximumIOps":  0,
+                           "IOMaximumBandwidth":  0,
+                           "MaskedPaths":  [
+                                               "/proc/acpi",
+                                               "/proc/asound",
+                                               "/proc/interrupts",
+                                               "/proc/kcore",
+                                               "/proc/keys",
+                                               "/proc/latency_stats",
+                                               "/proc/sched_debug",
+                                               "/proc/scsi",
+                                               "/proc/timer_list",
+                                               "/proc/timer_stats",
+                                               "/sys/devices/virtual/powercap",
+                                               "/sys/firmware"
+                                           ],
+                           "ReadonlyPaths":  [
+                                                 "/proc/bus",
+                                                 "/proc/fs",
+                                                 "/proc/irq",
+                                                 "/proc/sys",
+                                                 "/proc/sysrq-trigger"
+                                             ]
+                       },
+        "Storage":  {
+                        "RootFS":  {
+                                       "Snapshot":  {
+                                                        "Name":  "overlayfs"
+                                                    }
+                                   }
+                    },
+        "Mounts":  [
+                       {
+                           "Type":  "bind",
+                           "Source":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\nginx\\profesor.conf",
+                           "Destination":  "/etc/nginx/nginx.conf",
+                           "Mode":  "ro",
+                           "RW":  false,
+                           "Propagation":  "rprivate"
+                       },
+                       {
+                           "Type":  "bind",
+                           "Source":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\tests\\stress\\tls",
+                           "Destination":  "/etc/nginx/tls",
+                           "Mode":  "ro",
+                           "RW":  false,
+                           "Propagation":  "rprivate"
+                       }
+                   ],
+        "Config":  {
+                       "Hostname":  "270d12dfcd5e",
+                       "Domainname":  "",
+                       "User":  "",
+                       "AttachStdin":  false,
+                       "AttachStdout":  true,
+                       "AttachStderr":  true,
+                       "ExposedPorts":  {
+                                            "443/tcp":  {
+
+                                                        },
+                                            "80/tcp":  {
+
+                                                       }
+                                        },
+                       "Tty":  false,
+                       "OpenStdin":  false,
+                       "StdinOnce":  false,
+                       "Env":  [
+                                   "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                   "NGINX_VERSION=1.27.5",
+                                   "PKG_RELEASE=1",
+                                   "DYNPKG_RELEASE=1",
+                                   "NJS_VERSION=0.8.10",
+                                   "NJS_RELEASE=1"
+                               ],
+                       "Cmd":  [
+                                   "nginx",
+                                   "-g",
+                                   "daemon off;"
+                               ],
+                       "Image":  "nginx:1.27-alpine",
+                       "Volumes":  null,
+                       "WorkingDir":  "/",
+                       "Entrypoint":  [
+                                          "/docker-entrypoint.sh"
+                                      ],
+                       "Labels":  {
+                                      "com.docker.compose.config-hash":  "ba158138c8d6706bd32617e119fc9d67cc9c090c4e2a32f968877fce390eb33d",
+                                      "com.docker.compose.container-number":  "1",
+                                      "com.docker.compose.depends_on":  "extractor:service_healthy:false",
+                                      "com.docker.compose.image":  "sha256:62223d644fa234c3a1cc785ee14242ec47a77364226f1c811d2f669f96dc2ac8",
+                                      "com.docker.compose.oneoff":  "False",
+                                      "com.docker.compose.project":  "carga-local",
+                                      "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                      "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                      "com.docker.compose.replace":  "extractor-lb-1",
+                                      "com.docker.compose.service":  "extractor-lb",
+                                      "com.docker.compose.version":  "5.5.1",
+                                      "maintainer":  "NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"
+                                  },
+                       "StopSignal":  "SIGQUIT"
+                   },
+        "NetworkSettings":  {
+                                "SandboxID":  "962eb6d432b32905df2f4ada21b11e359f3f5d94c5625652aad29bf151c7805e",
+                                "SandboxKey":  "/var/run/docker/netns/962eb6d432b3",
+                                "Ports":  {
+                                              "443/tcp":  [
+                                                              {
+                                                                  "HostIp":  "0.0.0.0",
+                                                                  "HostPort":  "443"
+                                                              },
+                                                              {
+                                                                  "HostIp":  "::",
+                                                                  "HostPort":  "443"
+                                                              }
+                                                          ],
+                                              "80/tcp":  [
+                                                             {
+                                                                 "HostIp":  "0.0.0.0",
+                                                                 "HostPort":  "8080"
+                                                             },
+                                                             {
+                                                                 "HostIp":  "::",
+                                                                 "HostPort":  "8080"
+                                                             }
+                                                         ]
+                                          },
+                                "Networks":  {
+                                                 "carga-local_default":  {
+                                                                             "IPAMConfig":  null,
+                                                                             "Links":  null,
+                                                                             "Aliases":  [
+                                                                                             "carga-local-extractor-lb-1",
+                                                                                             "extractor-lb"
+                                                                                         ],
+                                                                             "DriverOpts":  null,
+                                                                             "GwPriority":  0,
+                                                                             "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                             "EndpointID":  "003c92eb8508b31cdd7cdcecbf1638d3fb887dcde5337c3220344faf76eb9096",
+                                                                             "Gateway":  "172.19.0.1",
+                                                                             "IPAddress":  "172.19.0.7",
+                                                                             "MacAddress":  "fe:03:2d:c2:c2:e2",
+                                                                             "IPPrefixLen":  16,
+                                                                             "IPv6Gateway":  "",
+                                                                             "GlobalIPv6Address":  "",
+                                                                             "GlobalIPv6PrefixLen":  0,
+                                                                             "DNSNames":  [
+                                                                                              "carga-local-extractor-lb-1",
+                                                                                              "extractor-lb",
+                                                                                              "270d12dfcd5e"
+                                                                                          ]
+                                                                         }
+                                             }
+                            },
+        "ImageManifestDescriptor":  {
+                                        "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                        "digest":  "sha256:62223d644fa234c3a1cc785ee14242ec47a77364226f1c811d2f669f96dc2ac8",
+                                        "size":  2495,
+                                        "annotations":  {
+                                                            "com.docker.official-images.bashbrew.arch":  "amd64",
+                                                            "org.opencontainers.image.base.digest":  "sha256:816d6a9736a3ccb74b5b0eb915c4ffb37bf6b7a98e7aaa715001ce3235a8a019",
+                                                            "org.opencontainers.image.base.name":  "nginx:1.27.5-alpine-slim",
+                                                            "org.opencontainers.image.created":  "2025-04-16T17:07:33Z",
+                                                            "org.opencontainers.image.revision":  "eaf8875a1967d24cea6ed8b37109075e39ed9e43",
+                                                            "org.opencontainers.image.source":  "https://github.com/nginx/docker-nginx.git#eaf8875a1967d24cea6ed8b37109075e39ed9e43:mainline/alpine",
+                                                            "org.opencontainers.image.url":  "https://hub.docker.com/_/nginx",
+                                                            "org.opencontainers.image.version":  "1.27.5-alpine"
+                                                        },
+                                        "platform":  {
+                                                         "architecture":  "amd64",
+                                                         "os":  "linux"
+                                                     }
+                                    }
+    },
+    {
+        "Id":  "41d97c6aa45072b0771f1579c7f4f641ced6dd2b15672cfeb01951af872ff71d",
+        "Created":  "2026-10-08T20:44:25.226527078Z",
+        "Path":  "uvicorn",
+        "Args":  [
+                     "extractor_service.main:app",
+                     "--host",
+                     "0.0.0.0",
+                     "--port",
+                     "8000",
+                     "--timeout-keep-alive",
+                     "60",
+                     "--no-access-log"
+                 ],
+        "State":  {
+                      "Status":  "running",
+                      "Running":  true,
+                      "Paused":  false,
+                      "Restarting":  false,
+                      "OOMKilled":  false,
+                      "Dead":  false,
+                      "Pid":  10674,
+                      "ExitCode":  0,
+                      "Error":  "",
+                      "StartedAt":  "2026-10-08T20:44:26.543534045Z",
+                      "FinishedAt":  "0001-01-01T00:00:00Z",
+                      "Health":  {
+                                     "Status":  "healthy",
+                                     "FailingStreak":  0,
+                                     "Log":  [
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:21.021707737Z",
+                                                     "End":  "2026-10-08T20:46:21.313212514Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:26.314163367Z",
+                                                     "End":  "2026-10-08T20:46:26.54721579Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:31.547976622Z",
+                                                     "End":  "2026-10-08T20:46:31.851604978Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:36.850893621Z",
+                                                     "End":  "2026-10-08T20:46:37.134518955Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:42.135211828Z",
+                                                     "End":  "2026-10-08T20:46:42.259234534Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 }
+                                             ]
+                                 }
+                  },
+        "Image":  "sha256:96393492d3b65fea3298d38bd419a000bcdb1724fea68a60b699244678f6f2f4",
+        "ResolvConfPath":  "/var/lib/docker/containers/41d97c6aa45072b0771f1579c7f4f641ced6dd2b15672cfeb01951af872ff71d/resolv.conf",
+        "HostnamePath":  "/var/lib/docker/containers/41d97c6aa45072b0771f1579c7f4f641ced6dd2b15672cfeb01951af872ff71d/hostname",
+        "HostsPath":  "/var/lib/docker/containers/41d97c6aa45072b0771f1579c7f4f641ced6dd2b15672cfeb01951af872ff71d/hosts",
+        "LogPath":  "",
+        "Name":  "/carga-local-extractor-1",
+        "RestartCount":  0,
+        "Driver":  "overlayfs",
+        "Platform":  "linux",
+        "MountLabel":  "",
+        "ProcessLabel":  "",
+        "AppArmorProfile":  "",
+        "ExecIDs":  null,
+        "HostConfig":  {
+                           "Binds":  null,
+                           "ContainerIDFile":  "",
+                           "LogConfig":  {
+                                             "Type":  "local",
+                                             "Config":  {
+
+                                                        }
+                                         },
+                           "NetworkMode":  "carga-local_default",
+                           "PortBindings":  {
+
+                                            },
+                           "RestartPolicy":  {
+                                                 "Name":  "unless-stopped",
+                                                 "MaximumRetryCount":  0
+                                             },
+                           "AutoRemove":  false,
+                           "VolumeDriver":  "",
+                           "VolumesFrom":  null,
+                           "ConsoleSize":  [
+                                               0,
+                                               0
+                                           ],
+                           "CapAdd":  null,
+                           "CapDrop":  null,
+                           "CgroupnsMode":  "private",
+                           "Dns":  null,
+                           "DnsOptions":  null,
+                           "DnsSearch":  null,
+                           "ExtraHosts":  [
+
+                                          ],
+                           "GroupAdd":  null,
+                           "IpcMode":  "private",
+                           "Cgroup":  "",
+                           "Links":  null,
+                           "OomScoreAdj":  0,
+                           "PidMode":  "",
+                           "Privileged":  false,
+                           "PublishAllPorts":  false,
+                           "ReadonlyRootfs":  false,
+                           "SecurityOpt":  null,
+                           "UTSMode":  "",
+                           "UsernsMode":  "",
+                           "ShmSize":  67108864,
+                           "Runtime":  "runc",
+                           "Isolation":  "",
+                           "CpuShares":  0,
+                           "Memory":  1073741824,
+                           "NanoCpus":  1000000000,
+                           "CgroupParent":  "",
+                           "BlkioWeight":  0,
+                           "BlkioWeightDevice":  null,
+                           "BlkioDeviceReadBps":  null,
+                           "BlkioDeviceWriteBps":  null,
+                           "BlkioDeviceReadIOps":  null,
+                           "BlkioDeviceWriteIOps":  null,
+                           "CpuPeriod":  0,
+                           "CpuQuota":  0,
+                           "CpuRealtimePeriod":  0,
+                           "CpuRealtimeRuntime":  0,
+                           "CpusetCpus":  "",
+                           "CpusetMems":  "",
+                           "Devices":  null,
+                           "DeviceCgroupRules":  null,
+                           "DeviceRequests":  null,
+                           "MemoryReservation":  0,
+                           "MemorySwap":  2147483648,
+                           "MemorySwappiness":  null,
+                           "OomKillDisable":  null,
+                           "PidsLimit":  null,
+                           "Ulimits":  null,
+                           "CpuCount":  0,
+                           "CpuPercent":  0,
+                           "IOMaximumIOps":  0,
+                           "IOMaximumBandwidth":  0,
+                           "MaskedPaths":  [
+                                               "/proc/acpi",
+                                               "/proc/asound",
+                                               "/proc/interrupts",
+                                               "/proc/kcore",
+                                               "/proc/keys",
+                                               "/proc/latency_stats",
+                                               "/proc/sched_debug",
+                                               "/proc/scsi",
+                                               "/proc/timer_list",
+                                               "/proc/timer_stats",
+                                               "/sys/devices/virtual/powercap",
+                                               "/sys/firmware"
+                                           ],
+                           "ReadonlyPaths":  [
+                                                 "/proc/bus",
+                                                 "/proc/fs",
+                                                 "/proc/irq",
+                                                 "/proc/sys",
+                                                 "/proc/sysrq-trigger"
+                                             ]
+                       },
+        "Storage":  {
+                        "RootFS":  {
+                                       "Snapshot":  {
+                                                        "Name":  "overlayfs"
+                                                    }
+                                   }
+                    },
+        "Mounts":  [
+
+                   ],
+        "Config":  {
+                       "Hostname":  "41d97c6aa450",
+                       "Domainname":  "",
+                       "User":  "",
+                       "AttachStdin":  false,
+                       "AttachStdout":  true,
+                       "AttachStderr":  true,
+                       "ExposedPorts":  {
+                                            "8000/tcp":  {
+
+                                                         }
+                                        },
+                       "Tty":  false,
+                       "OpenStdin":  false,
+                       "StdinOnce":  false,
+                       "Env":  [
+                                   "QUEUE_TIMEOUT_S",
+                                   "REQUEST_TIMEOUT_S",
+                                   "PATH=/app/.venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                   "LANG=C.UTF-8",
+                                   "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+                                   "PYTHON_VERSION=3.12.15",
+                                   "PYTHON_SHA256=c2c4321961fab0fb999d66e0cecf521c2ab3994c7992873ea99e306c1094fd5a",
+                                   "PYTHONUNBUFFERED=1",
+                                   "UV_COMPILE_BYTECODE=1",
+                                   "UV_LINK_MODE=copy"
+                               ],
+                       "Cmd":  [
+                                   "uvicorn",
+                                   "extractor_service.main:app",
+                                   "--host",
+                                   "0.0.0.0",
+                                   "--port",
+                                   "8000",
+                                   "--timeout-keep-alive",
+                                   "60",
+                                   "--no-access-log"
+                               ],
+                       "Healthcheck":  {
+                                           "Test":  [
+                                                        "CMD",
+                                                        "python",
+                                                        "-c",
+                                                        "import urllib.request; urllib.request.urlopen(\u0027http://localhost:8000/health\u0027)"
+                                                    ],
+                                           "Interval":  5000000000,
+                                           "Timeout":  3000000000,
+                                           "Retries":  5
+                                       },
+                       "Image":  "carga-local-extractor",
+                       "Volumes":  null,
+                       "WorkingDir":  "/app",
+                       "Entrypoint":  null,
+                       "Labels":  {
+                                      "com.docker.compose.config-hash":  "a1a6a82919d502cacc38a63d9c268f932dd98e0e7fbe0d21da267726a0a8c92d",
+                                      "com.docker.compose.container-number":  "1",
+                                      "com.docker.compose.depends_on":  "",
+                                      "com.docker.compose.image":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                      "com.docker.compose.oneoff":  "False",
+                                      "com.docker.compose.project":  "carga-local",
+                                      "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                      "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                      "com.docker.compose.replace":  "extractor-1",
+                                      "com.docker.compose.service":  "extractor",
+                                      "com.docker.compose.version":  "5.5.1"
+                                  }
+                   },
+        "NetworkSettings":  {
+                                "SandboxID":  "f537bad3319baccf4fcd9545af787f288eb7be71e372e09f9680cfb3dc095d9d",
+                                "SandboxKey":  "/var/run/docker/netns/f537bad3319b",
+                                "Ports":  {
+                                              "8000/tcp":  null
+                                          },
+                                "Networks":  {
+                                                 "carga-local_default":  {
+                                                                             "IPAMConfig":  null,
+                                                                             "Links":  null,
+                                                                             "Aliases":  [
+                                                                                             "carga-local-extractor-1",
+                                                                                             "extractor"
+                                                                                         ],
+                                                                             "DriverOpts":  null,
+                                                                             "GwPriority":  0,
+                                                                             "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                             "EndpointID":  "93b4f8b1c3a71a52d83dd1e370924e21850b28066fc670e4117e7e918f9dba15",
+                                                                             "Gateway":  "172.19.0.1",
+                                                                             "IPAddress":  "172.19.0.3",
+                                                                             "MacAddress":  "d6:35:3f:de:2c:1c",
+                                                                             "IPPrefixLen":  16,
+                                                                             "IPv6Gateway":  "",
+                                                                             "GlobalIPv6Address":  "",
+                                                                             "GlobalIPv6PrefixLen":  0,
+                                                                             "DNSNames":  [
+                                                                                              "carga-local-extractor-1",
+                                                                                              "extractor",
+                                                                                              "41d97c6aa450"
+                                                                                          ]
+                                                                         }
+                                             }
+                            },
+        "ImageManifestDescriptor":  {
+                                        "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                        "digest":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                        "size":  2008,
+                                        "platform":  {
+                                                         "architecture":  "amd64",
+                                                         "os":  "linux"
+                                                     }
+                                    }
+    },
+    {
+        "Id":  "3e86369c216246e9368af43f4cc1f5968305031305c68769971e51f8f7d70e10",
+        "Created":  "2026-10-08T20:44:24.243998676Z",
+        "Path":  "uvicorn",
+        "Args":  [
+                     "extractor_service.main:app",
+                     "--host",
+                     "0.0.0.0",
+                     "--port",
+                     "8000",
+                     "--timeout-keep-alive",
+                     "60",
+                     "--no-access-log"
+                 ],
+        "State":  {
+                      "Status":  "running",
+                      "Running":  true,
+                      "Paused":  false,
+                      "Restarting":  false,
+                      "OOMKilled":  false,
+                      "Dead":  false,
+                      "Pid":  10785,
+                      "ExitCode":  0,
+                      "Error":  "",
+                      "StartedAt":  "2026-10-08T20:44:26.862135957Z",
+                      "FinishedAt":  "0001-01-01T00:00:00Z",
+                      "Health":  {
+                                     "Status":  "healthy",
+                                     "FailingStreak":  0,
+                                     "Log":  [
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:21.189544197Z",
+                                                     "End":  "2026-10-08T20:46:21.402853459Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:26.403566481Z",
+                                                     "End":  "2026-10-08T20:46:26.687216931Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:31.688449691Z",
+                                                     "End":  "2026-10-08T20:46:31.909558669Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:36.909161124Z",
+                                                     "End":  "2026-10-08T20:46:37.191622616Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:42.192797031Z",
+                                                     "End":  "2026-10-08T20:46:42.3182323Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 }
+                                             ]
+                                 }
+                  },
+        "Image":  "sha256:96393492d3b65fea3298d38bd419a000bcdb1724fea68a60b699244678f6f2f4",
+        "ResolvConfPath":  "/var/lib/docker/containers/3e86369c216246e9368af43f4cc1f5968305031305c68769971e51f8f7d70e10/resolv.conf",
+        "HostnamePath":  "/var/lib/docker/containers/3e86369c216246e9368af43f4cc1f5968305031305c68769971e51f8f7d70e10/hostname",
+        "HostsPath":  "/var/lib/docker/containers/3e86369c216246e9368af43f4cc1f5968305031305c68769971e51f8f7d70e10/hosts",
+        "LogPath":  "",
+        "Name":  "/carga-local-extractor-2",
+        "RestartCount":  0,
+        "Driver":  "overlayfs",
+        "Platform":  "linux",
+        "MountLabel":  "",
+        "ProcessLabel":  "",
+        "AppArmorProfile":  "",
+        "ExecIDs":  null,
+        "HostConfig":  {
+                           "Binds":  null,
+                           "ContainerIDFile":  "",
+                           "LogConfig":  {
+                                             "Type":  "local",
+                                             "Config":  {
+
+                                                        }
+                                         },
+                           "NetworkMode":  "carga-local_default",
+                           "PortBindings":  {
+
+                                            },
+                           "RestartPolicy":  {
+                                                 "Name":  "unless-stopped",
+                                                 "MaximumRetryCount":  0
+                                             },
+                           "AutoRemove":  false,
+                           "VolumeDriver":  "",
+                           "VolumesFrom":  null,
+                           "ConsoleSize":  [
+                                               0,
+                                               0
+                                           ],
+                           "CapAdd":  null,
+                           "CapDrop":  null,
+                           "CgroupnsMode":  "private",
+                           "Dns":  null,
+                           "DnsOptions":  null,
+                           "DnsSearch":  null,
+                           "ExtraHosts":  [
+
+                                          ],
+                           "GroupAdd":  null,
+                           "IpcMode":  "private",
+                           "Cgroup":  "",
+                           "Links":  null,
+                           "OomScoreAdj":  0,
+                           "PidMode":  "",
+                           "Privileged":  false,
+                           "PublishAllPorts":  false,
+                           "ReadonlyRootfs":  false,
+                           "SecurityOpt":  null,
+                           "UTSMode":  "",
+                           "UsernsMode":  "",
+                           "ShmSize":  67108864,
+                           "Runtime":  "runc",
+                           "Isolation":  "",
+                           "CpuShares":  0,
+                           "Memory":  1073741824,
+                           "NanoCpus":  1000000000,
+                           "CgroupParent":  "",
+                           "BlkioWeight":  0,
+                           "BlkioWeightDevice":  null,
+                           "BlkioDeviceReadBps":  null,
+                           "BlkioDeviceWriteBps":  null,
+                           "BlkioDeviceReadIOps":  null,
+                           "BlkioDeviceWriteIOps":  null,
+                           "CpuPeriod":  0,
+                           "CpuQuota":  0,
+                           "CpuRealtimePeriod":  0,
+                           "CpuRealtimeRuntime":  0,
+                           "CpusetCpus":  "",
+                           "CpusetMems":  "",
+                           "Devices":  null,
+                           "DeviceCgroupRules":  null,
+                           "DeviceRequests":  null,
+                           "MemoryReservation":  0,
+                           "MemorySwap":  2147483648,
+                           "MemorySwappiness":  null,
+                           "OomKillDisable":  null,
+                           "PidsLimit":  null,
+                           "Ulimits":  null,
+                           "CpuCount":  0,
+                           "CpuPercent":  0,
+                           "IOMaximumIOps":  0,
+                           "IOMaximumBandwidth":  0,
+                           "MaskedPaths":  [
+                                               "/proc/acpi",
+                                               "/proc/asound",
+                                               "/proc/interrupts",
+                                               "/proc/kcore",
+                                               "/proc/keys",
+                                               "/proc/latency_stats",
+                                               "/proc/sched_debug",
+                                               "/proc/scsi",
+                                               "/proc/timer_list",
+                                               "/proc/timer_stats",
+                                               "/sys/devices/virtual/powercap",
+                                               "/sys/firmware"
+                                           ],
+                           "ReadonlyPaths":  [
+                                                 "/proc/bus",
+                                                 "/proc/fs",
+                                                 "/proc/irq",
+                                                 "/proc/sys",
+                                                 "/proc/sysrq-trigger"
+                                             ]
+                       },
+        "Storage":  {
+                        "RootFS":  {
+                                       "Snapshot":  {
+                                                        "Name":  "overlayfs"
+                                                    }
+                                   }
+                    },
+        "Mounts":  [
+
+                   ],
+        "Config":  {
+                       "Hostname":  "3e86369c2162",
+                       "Domainname":  "",
+                       "User":  "",
+                       "AttachStdin":  false,
+                       "AttachStdout":  true,
+                       "AttachStderr":  true,
+                       "ExposedPorts":  {
+                                            "8000/tcp":  {
+
+                                                         }
+                                        },
+                       "Tty":  false,
+                       "OpenStdin":  false,
+                       "StdinOnce":  false,
+                       "Env":  [
+                                   "QUEUE_TIMEOUT_S",
+                                   "REQUEST_TIMEOUT_S",
+                                   "PATH=/app/.venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                   "LANG=C.UTF-8",
+                                   "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+                                   "PYTHON_VERSION=3.12.15",
+                                   "PYTHON_SHA256=c2c4321961fab0fb999d66e0cecf521c2ab3994c7992873ea99e306c1094fd5a",
+                                   "PYTHONUNBUFFERED=1",
+                                   "UV_COMPILE_BYTECODE=1",
+                                   "UV_LINK_MODE=copy"
+                               ],
+                       "Cmd":  [
+                                   "uvicorn",
+                                   "extractor_service.main:app",
+                                   "--host",
+                                   "0.0.0.0",
+                                   "--port",
+                                   "8000",
+                                   "--timeout-keep-alive",
+                                   "60",
+                                   "--no-access-log"
+                               ],
+                       "Healthcheck":  {
+                                           "Test":  [
+                                                        "CMD",
+                                                        "python",
+                                                        "-c",
+                                                        "import urllib.request; urllib.request.urlopen(\u0027http://localhost:8000/health\u0027)"
+                                                    ],
+                                           "Interval":  5000000000,
+                                           "Timeout":  3000000000,
+                                           "Retries":  5
+                                       },
+                       "Image":  "carga-local-extractor",
+                       "Volumes":  null,
+                       "WorkingDir":  "/app",
+                       "Entrypoint":  null,
+                       "Labels":  {
+                                      "com.docker.compose.config-hash":  "a1a6a82919d502cacc38a63d9c268f932dd98e0e7fbe0d21da267726a0a8c92d",
+                                      "com.docker.compose.container-number":  "2",
+                                      "com.docker.compose.depends_on":  "",
+                                      "com.docker.compose.image":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                      "com.docker.compose.oneoff":  "False",
+                                      "com.docker.compose.project":  "carga-local",
+                                      "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                      "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                      "com.docker.compose.replace":  "extractor-2",
+                                      "com.docker.compose.service":  "extractor",
+                                      "com.docker.compose.version":  "5.5.1"
+                                  }
+                   },
+        "NetworkSettings":  {
+                                "SandboxID":  "a4dc119078cd4c9169fee8d088c4f790f9ea48e648e1a248a1d359d3f187c987",
+                                "SandboxKey":  "/var/run/docker/netns/a4dc119078cd",
+                                "Ports":  {
+                                              "8000/tcp":  null
+                                          },
+                                "Networks":  {
+                                                 "carga-local_default":  {
+                                                                             "IPAMConfig":  null,
+                                                                             "Links":  null,
+                                                                             "Aliases":  [
+                                                                                             "carga-local-extractor-2",
+                                                                                             "extractor"
+                                                                                         ],
+                                                                             "DriverOpts":  null,
+                                                                             "GwPriority":  0,
+                                                                             "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                             "EndpointID":  "f8c9a9f0cc3bf5648542cdff0ad87985808856d64fea614cc664815ff1029815",
+                                                                             "Gateway":  "172.19.0.1",
+                                                                             "IPAddress":  "172.19.0.5",
+                                                                             "MacAddress":  "1e:d9:64:f7:14:fe",
+                                                                             "IPPrefixLen":  16,
+                                                                             "IPv6Gateway":  "",
+                                                                             "GlobalIPv6Address":  "",
+                                                                             "GlobalIPv6PrefixLen":  0,
+                                                                             "DNSNames":  [
+                                                                                              "carga-local-extractor-2",
+                                                                                              "extractor",
+                                                                                              "3e86369c2162"
+                                                                                          ]
+                                                                         }
+                                             }
+                            },
+        "ImageManifestDescriptor":  {
+                                        "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                        "digest":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                        "size":  2008,
+                                        "platform":  {
+                                                         "architecture":  "amd64",
+                                                         "os":  "linux"
+                                                     }
+                                    }
+    },
+    {
+        "Id":  "ea2e706d9b3c2a3b88d9ccfcf99b2d0797c70b3a089b4f9cc8ccc567a61cd87f",
+        "Created":  "2026-10-08T20:44:23.774705417Z",
+        "Path":  "uvicorn",
+        "Args":  [
+                     "extractor_service.main:app",
+                     "--host",
+                     "0.0.0.0",
+                     "--port",
+                     "8000",
+                     "--timeout-keep-alive",
+                     "60",
+                     "--no-access-log"
+                 ],
+        "State":  {
+                      "Status":  "running",
+                      "Running":  true,
+                      "Paused":  false,
+                      "Restarting":  false,
+                      "OOMKilled":  false,
+                      "Dead":  false,
+                      "Pid":  10842,
+                      "ExitCode":  0,
+                      "Error":  "",
+                      "StartedAt":  "2026-10-08T20:44:27.007658459Z",
+                      "FinishedAt":  "0001-01-01T00:00:00Z",
+                      "Health":  {
+                                     "Status":  "healthy",
+                                     "FailingStreak":  0,
+                                     "Log":  [
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:17.108314209Z",
+                                                     "End":  "2026-10-08T20:46:17.394333233Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:22.395377271Z",
+                                                     "End":  "2026-10-08T20:46:22.60923441Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:27.610007187Z",
+                                                     "End":  "2026-10-08T20:46:27.819918344Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:32.821122761Z",
+                                                     "End":  "2026-10-08T20:46:33.12177731Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:38.121651526Z",
+                                                     "End":  "2026-10-08T20:46:38.386208784Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 }
+                                             ]
+                                 }
+                  },
+        "Image":  "sha256:96393492d3b65fea3298d38bd419a000bcdb1724fea68a60b699244678f6f2f4",
+        "ResolvConfPath":  "/var/lib/docker/containers/ea2e706d9b3c2a3b88d9ccfcf99b2d0797c70b3a089b4f9cc8ccc567a61cd87f/resolv.conf",
+        "HostnamePath":  "/var/lib/docker/containers/ea2e706d9b3c2a3b88d9ccfcf99b2d0797c70b3a089b4f9cc8ccc567a61cd87f/hostname",
+        "HostsPath":  "/var/lib/docker/containers/ea2e706d9b3c2a3b88d9ccfcf99b2d0797c70b3a089b4f9cc8ccc567a61cd87f/hosts",
+        "LogPath":  "",
+        "Name":  "/carga-local-extractor-3",
+        "RestartCount":  0,
+        "Driver":  "overlayfs",
+        "Platform":  "linux",
+        "MountLabel":  "",
+        "ProcessLabel":  "",
+        "AppArmorProfile":  "",
+        "ExecIDs":  null,
+        "HostConfig":  {
+                           "Binds":  null,
+                           "ContainerIDFile":  "",
+                           "LogConfig":  {
+                                             "Type":  "local",
+                                             "Config":  {
+
+                                                        }
+                                         },
+                           "NetworkMode":  "carga-local_default",
+                           "PortBindings":  {
+
+                                            },
+                           "RestartPolicy":  {
+                                                 "Name":  "unless-stopped",
+                                                 "MaximumRetryCount":  0
+                                             },
+                           "AutoRemove":  false,
+                           "VolumeDriver":  "",
+                           "VolumesFrom":  null,
+                           "ConsoleSize":  [
+                                               0,
+                                               0
+                                           ],
+                           "CapAdd":  null,
+                           "CapDrop":  null,
+                           "CgroupnsMode":  "private",
+                           "Dns":  null,
+                           "DnsOptions":  null,
+                           "DnsSearch":  null,
+                           "ExtraHosts":  [
+
+                                          ],
+                           "GroupAdd":  null,
+                           "IpcMode":  "private",
+                           "Cgroup":  "",
+                           "Links":  null,
+                           "OomScoreAdj":  0,
+                           "PidMode":  "",
+                           "Privileged":  false,
+                           "PublishAllPorts":  false,
+                           "ReadonlyRootfs":  false,
+                           "SecurityOpt":  null,
+                           "UTSMode":  "",
+                           "UsernsMode":  "",
+                           "ShmSize":  67108864,
+                           "Runtime":  "runc",
+                           "Isolation":  "",
+                           "CpuShares":  0,
+                           "Memory":  1073741824,
+                           "NanoCpus":  1000000000,
+                           "CgroupParent":  "",
+                           "BlkioWeight":  0,
+                           "BlkioWeightDevice":  null,
+                           "BlkioDeviceReadBps":  null,
+                           "BlkioDeviceWriteBps":  null,
+                           "BlkioDeviceReadIOps":  null,
+                           "BlkioDeviceWriteIOps":  null,
+                           "CpuPeriod":  0,
+                           "CpuQuota":  0,
+                           "CpuRealtimePeriod":  0,
+                           "CpuRealtimeRuntime":  0,
+                           "CpusetCpus":  "",
+                           "CpusetMems":  "",
+                           "Devices":  null,
+                           "DeviceCgroupRules":  null,
+                           "DeviceRequests":  null,
+                           "MemoryReservation":  0,
+                           "MemorySwap":  2147483648,
+                           "MemorySwappiness":  null,
+                           "OomKillDisable":  null,
+                           "PidsLimit":  null,
+                           "Ulimits":  null,
+                           "CpuCount":  0,
+                           "CpuPercent":  0,
+                           "IOMaximumIOps":  0,
+                           "IOMaximumBandwidth":  0,
+                           "MaskedPaths":  [
+                                               "/proc/acpi",
+                                               "/proc/asound",
+                                               "/proc/interrupts",
+                                               "/proc/kcore",
+                                               "/proc/keys",
+                                               "/proc/latency_stats",
+                                               "/proc/sched_debug",
+                                               "/proc/scsi",
+                                               "/proc/timer_list",
+                                               "/proc/timer_stats",
+                                               "/sys/devices/virtual/powercap",
+                                               "/sys/firmware"
+                                           ],
+                           "ReadonlyPaths":  [
+                                                 "/proc/bus",
+                                                 "/proc/fs",
+                                                 "/proc/irq",
+                                                 "/proc/sys",
+                                                 "/proc/sysrq-trigger"
+                                             ]
+                       },
+        "Storage":  {
+                        "RootFS":  {
+                                       "Snapshot":  {
+                                                        "Name":  "overlayfs"
+                                                    }
+                                   }
+                    },
+        "Mounts":  [
+
+                   ],
+        "Config":  {
+                       "Hostname":  "ea2e706d9b3c",
+                       "Domainname":  "",
+                       "User":  "",
+                       "AttachStdin":  false,
+                       "AttachStdout":  true,
+                       "AttachStderr":  true,
+                       "ExposedPorts":  {
+                                            "8000/tcp":  {
+
+                                                         }
+                                        },
+                       "Tty":  false,
+                       "OpenStdin":  false,
+                       "StdinOnce":  false,
+                       "Env":  [
+                                   "QUEUE_TIMEOUT_S",
+                                   "REQUEST_TIMEOUT_S",
+                                   "PATH=/app/.venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                   "LANG=C.UTF-8",
+                                   "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+                                   "PYTHON_VERSION=3.12.15",
+                                   "PYTHON_SHA256=c2c4321961fab0fb999d66e0cecf521c2ab3994c7992873ea99e306c1094fd5a",
+                                   "PYTHONUNBUFFERED=1",
+                                   "UV_COMPILE_BYTECODE=1",
+                                   "UV_LINK_MODE=copy"
+                               ],
+                       "Cmd":  [
+                                   "uvicorn",
+                                   "extractor_service.main:app",
+                                   "--host",
+                                   "0.0.0.0",
+                                   "--port",
+                                   "8000",
+                                   "--timeout-keep-alive",
+                                   "60",
+                                   "--no-access-log"
+                               ],
+                       "Healthcheck":  {
+                                           "Test":  [
+                                                        "CMD",
+                                                        "python",
+                                                        "-c",
+                                                        "import urllib.request; urllib.request.urlopen(\u0027http://localhost:8000/health\u0027)"
+                                                    ],
+                                           "Interval":  5000000000,
+                                           "Timeout":  3000000000,
+                                           "Retries":  5
+                                       },
+                       "Image":  "carga-local-extractor",
+                       "Volumes":  null,
+                       "WorkingDir":  "/app",
+                       "Entrypoint":  null,
+                       "Labels":  {
+                                      "com.docker.compose.config-hash":  "a1a6a82919d502cacc38a63d9c268f932dd98e0e7fbe0d21da267726a0a8c92d",
+                                      "com.docker.compose.container-number":  "3",
+                                      "com.docker.compose.depends_on":  "",
+                                      "com.docker.compose.image":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                      "com.docker.compose.oneoff":  "False",
+                                      "com.docker.compose.project":  "carga-local",
+                                      "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                      "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                      "com.docker.compose.replace":  "extractor-3",
+                                      "com.docker.compose.service":  "extractor",
+                                      "com.docker.compose.version":  "5.5.1"
+                                  }
+                   },
+        "NetworkSettings":  {
+                                "SandboxID":  "d1dc5f4738181ba98b3cc7c49486c53c72a993950873cd5dfe3969176f4b2fba",
+                                "SandboxKey":  "/var/run/docker/netns/d1dc5f473818",
+                                "Ports":  {
+                                              "8000/tcp":  null
+                                          },
+                                "Networks":  {
+                                                 "carga-local_default":  {
+                                                                             "IPAMConfig":  null,
+                                                                             "Links":  null,
+                                                                             "Aliases":  [
+                                                                                             "carga-local-extractor-3",
+                                                                                             "extractor"
+                                                                                         ],
+                                                                             "DriverOpts":  null,
+                                                                             "GwPriority":  0,
+                                                                             "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                             "EndpointID":  "87a122458216a2fd56321ec332f372d9b3553b0331911ce46551b9c21eab5f8c",
+                                                                             "Gateway":  "172.19.0.1",
+                                                                             "IPAddress":  "172.19.0.6",
+                                                                             "MacAddress":  "fe:42:e3:5c:38:eb",
+                                                                             "IPPrefixLen":  16,
+                                                                             "IPv6Gateway":  "",
+                                                                             "GlobalIPv6Address":  "",
+                                                                             "GlobalIPv6PrefixLen":  0,
+                                                                             "DNSNames":  [
+                                                                                              "carga-local-extractor-3",
+                                                                                              "extractor",
+                                                                                              "ea2e706d9b3c"
+                                                                                          ]
+                                                                         }
+                                             }
+                            },
+        "ImageManifestDescriptor":  {
+                                        "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                        "digest":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                        "size":  2008,
+                                        "platform":  {
+                                                         "architecture":  "amd64",
+                                                         "os":  "linux"
+                                                     }
+                                    }
+    },
+    {
+        "Id":  "5120a17b26be01035e0b4c31cb06b39c309c0576fe5417ae3c7fc64ff031dbb0",
+        "Created":  "2026-10-08T20:44:25.707595796Z",
+        "Path":  "uvicorn",
+        "Args":  [
+                     "extractor_service.main:app",
+                     "--host",
+                     "0.0.0.0",
+                     "--port",
+                     "8000",
+                     "--timeout-keep-alive",
+                     "60",
+                     "--no-access-log"
+                 ],
+        "State":  {
+                      "Status":  "running",
+                      "Running":  true,
+                      "Paused":  false,
+                      "Restarting":  false,
+                      "OOMKilled":  false,
+                      "Dead":  false,
+                      "Pid":  10617,
+                      "ExitCode":  0,
+                      "Error":  "",
+                      "StartedAt":  "2026-10-08T20:44:26.381278949Z",
+                      "FinishedAt":  "0001-01-01T00:00:00Z",
+                      "Health":  {
+                                     "Status":  "healthy",
+                                     "FailingStreak":  0,
+                                     "Log":  [
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:20.822363221Z",
+                                                     "End":  "2026-10-08T20:46:21.085086967Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:26.087318031Z",
+                                                     "End":  "2026-10-08T20:46:26.416238164Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:31.417527915Z",
+                                                     "End":  "2026-10-08T20:46:31.703455132Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:36.702720275Z",
+                                                     "End":  "2026-10-08T20:46:37.017269125Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:42.018489053Z",
+                                                     "End":  "2026-10-08T20:46:42.153140839Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 }
+                                             ]
+                                 }
+                  },
+        "Image":  "sha256:96393492d3b65fea3298d38bd419a000bcdb1724fea68a60b699244678f6f2f4",
+        "ResolvConfPath":  "/var/lib/docker/containers/5120a17b26be01035e0b4c31cb06b39c309c0576fe5417ae3c7fc64ff031dbb0/resolv.conf",
+        "HostnamePath":  "/var/lib/docker/containers/5120a17b26be01035e0b4c31cb06b39c309c0576fe5417ae3c7fc64ff031dbb0/hostname",
+        "HostsPath":  "/var/lib/docker/containers/5120a17b26be01035e0b4c31cb06b39c309c0576fe5417ae3c7fc64ff031dbb0/hosts",
+        "LogPath":  "",
+        "Name":  "/carga-local-extractor-4",
+        "RestartCount":  0,
+        "Driver":  "overlayfs",
+        "Platform":  "linux",
+        "MountLabel":  "",
+        "ProcessLabel":  "",
+        "AppArmorProfile":  "",
+        "ExecIDs":  null,
+        "HostConfig":  {
+                           "Binds":  null,
+                           "ContainerIDFile":  "",
+                           "LogConfig":  {
+                                             "Type":  "local",
+                                             "Config":  {
+
+                                                        }
+                                         },
+                           "NetworkMode":  "carga-local_default",
+                           "PortBindings":  {
+
+                                            },
+                           "RestartPolicy":  {
+                                                 "Name":  "unless-stopped",
+                                                 "MaximumRetryCount":  0
+                                             },
+                           "AutoRemove":  false,
+                           "VolumeDriver":  "",
+                           "VolumesFrom":  null,
+                           "ConsoleSize":  [
+                                               0,
+                                               0
+                                           ],
+                           "CapAdd":  null,
+                           "CapDrop":  null,
+                           "CgroupnsMode":  "private",
+                           "Dns":  null,
+                           "DnsOptions":  null,
+                           "DnsSearch":  null,
+                           "ExtraHosts":  [
+
+                                          ],
+                           "GroupAdd":  null,
+                           "IpcMode":  "private",
+                           "Cgroup":  "",
+                           "Links":  null,
+                           "OomScoreAdj":  0,
+                           "PidMode":  "",
+                           "Privileged":  false,
+                           "PublishAllPorts":  false,
+                           "ReadonlyRootfs":  false,
+                           "SecurityOpt":  null,
+                           "UTSMode":  "",
+                           "UsernsMode":  "",
+                           "ShmSize":  67108864,
+                           "Runtime":  "runc",
+                           "Isolation":  "",
+                           "CpuShares":  0,
+                           "Memory":  1073741824,
+                           "NanoCpus":  1000000000,
+                           "CgroupParent":  "",
+                           "BlkioWeight":  0,
+                           "BlkioWeightDevice":  null,
+                           "BlkioDeviceReadBps":  null,
+                           "BlkioDeviceWriteBps":  null,
+                           "BlkioDeviceReadIOps":  null,
+                           "BlkioDeviceWriteIOps":  null,
+                           "CpuPeriod":  0,
+                           "CpuQuota":  0,
+                           "CpuRealtimePeriod":  0,
+                           "CpuRealtimeRuntime":  0,
+                           "CpusetCpus":  "",
+                           "CpusetMems":  "",
+                           "Devices":  null,
+                           "DeviceCgroupRules":  null,
+                           "DeviceRequests":  null,
+                           "MemoryReservation":  0,
+                           "MemorySwap":  2147483648,
+                           "MemorySwappiness":  null,
+                           "OomKillDisable":  null,
+                           "PidsLimit":  null,
+                           "Ulimits":  null,
+                           "CpuCount":  0,
+                           "CpuPercent":  0,
+                           "IOMaximumIOps":  0,
+                           "IOMaximumBandwidth":  0,
+                           "MaskedPaths":  [
+                                               "/proc/acpi",
+                                               "/proc/asound",
+                                               "/proc/interrupts",
+                                               "/proc/kcore",
+                                               "/proc/keys",
+                                               "/proc/latency_stats",
+                                               "/proc/sched_debug",
+                                               "/proc/scsi",
+                                               "/proc/timer_list",
+                                               "/proc/timer_stats",
+                                               "/sys/devices/virtual/powercap",
+                                               "/sys/firmware"
+                                           ],
+                           "ReadonlyPaths":  [
+                                                 "/proc/bus",
+                                                 "/proc/fs",
+                                                 "/proc/irq",
+                                                 "/proc/sys",
+                                                 "/proc/sysrq-trigger"
+                                             ]
+                       },
+        "Storage":  {
+                        "RootFS":  {
+                                       "Snapshot":  {
+                                                        "Name":  "overlayfs"
+                                                    }
+                                   }
+                    },
+        "Mounts":  [
+
+                   ],
+        "Config":  {
+                       "Hostname":  "5120a17b26be",
+                       "Domainname":  "",
+                       "User":  "",
+                       "AttachStdin":  false,
+                       "AttachStdout":  true,
+                       "AttachStderr":  true,
+                       "ExposedPorts":  {
+                                            "8000/tcp":  {
+
+                                                         }
+                                        },
+                       "Tty":  false,
+                       "OpenStdin":  false,
+                       "StdinOnce":  false,
+                       "Env":  [
+                                   "REQUEST_TIMEOUT_S",
+                                   "QUEUE_TIMEOUT_S",
+                                   "PATH=/app/.venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                   "LANG=C.UTF-8",
+                                   "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+                                   "PYTHON_VERSION=3.12.15",
+                                   "PYTHON_SHA256=c2c4321961fab0fb999d66e0cecf521c2ab3994c7992873ea99e306c1094fd5a",
+                                   "PYTHONUNBUFFERED=1",
+                                   "UV_COMPILE_BYTECODE=1",
+                                   "UV_LINK_MODE=copy"
+                               ],
+                       "Cmd":  [
+                                   "uvicorn",
+                                   "extractor_service.main:app",
+                                   "--host",
+                                   "0.0.0.0",
+                                   "--port",
+                                   "8000",
+                                   "--timeout-keep-alive",
+                                   "60",
+                                   "--no-access-log"
+                               ],
+                       "Healthcheck":  {
+                                           "Test":  [
+                                                        "CMD",
+                                                        "python",
+                                                        "-c",
+                                                        "import urllib.request; urllib.request.urlopen(\u0027http://localhost:8000/health\u0027)"
+                                                    ],
+                                           "Interval":  5000000000,
+                                           "Timeout":  3000000000,
+                                           "Retries":  5
+                                       },
+                       "Image":  "carga-local-extractor",
+                       "Volumes":  null,
+                       "WorkingDir":  "/app",
+                       "Entrypoint":  null,
+                       "Labels":  {
+                                      "com.docker.compose.config-hash":  "a1a6a82919d502cacc38a63d9c268f932dd98e0e7fbe0d21da267726a0a8c92d",
+                                      "com.docker.compose.container-number":  "4",
+                                      "com.docker.compose.depends_on":  "",
+                                      "com.docker.compose.image":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                      "com.docker.compose.oneoff":  "False",
+                                      "com.docker.compose.project":  "carga-local",
+                                      "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                      "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                      "com.docker.compose.replace":  "extractor-4",
+                                      "com.docker.compose.service":  "extractor",
+                                      "com.docker.compose.version":  "5.5.1"
+                                  }
+                   },
+        "NetworkSettings":  {
+                                "SandboxID":  "7808e09f9696b6b62704a15e2fe390894ff8f3c9696a11e6039a58dda18a06af",
+                                "SandboxKey":  "/var/run/docker/netns/7808e09f9696",
+                                "Ports":  {
+                                              "8000/tcp":  null
+                                          },
+                                "Networks":  {
+                                                 "carga-local_default":  {
+                                                                             "IPAMConfig":  null,
+                                                                             "Links":  null,
+                                                                             "Aliases":  [
+                                                                                             "carga-local-extractor-4",
+                                                                                             "extractor"
+                                                                                         ],
+                                                                             "DriverOpts":  null,
+                                                                             "GwPriority":  0,
+                                                                             "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                             "EndpointID":  "ede8e15013d32fe69cc47184a3f9bd5c37f345e14ea89934cfb34c01b2435fd2",
+                                                                             "Gateway":  "172.19.0.1",
+                                                                             "IPAddress":  "172.19.0.2",
+                                                                             "MacAddress":  "c6:1d:55:0d:09:c4",
+                                                                             "IPPrefixLen":  16,
+                                                                             "IPv6Gateway":  "",
+                                                                             "GlobalIPv6Address":  "",
+                                                                             "GlobalIPv6PrefixLen":  0,
+                                                                             "DNSNames":  [
+                                                                                              "carga-local-extractor-4",
+                                                                                              "extractor",
+                                                                                              "5120a17b26be"
+                                                                                          ]
+                                                                         }
+                                             }
+                            },
+        "ImageManifestDescriptor":  {
+                                        "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                        "digest":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                        "size":  2008,
+                                        "platform":  {
+                                                         "architecture":  "amd64",
+                                                         "os":  "linux"
+                                                     }
+                                    }
+    },
+    {
+        "Id":  "a0d0c09dfa3ef219e5d43abf40363cf463b84fc19a0ed54874017aec283a7717",
+        "Created":  "2026-10-08T20:44:24.727286199Z",
+        "Path":  "uvicorn",
+        "Args":  [
+                     "extractor_service.main:app",
+                     "--host",
+                     "0.0.0.0",
+                     "--port",
+                     "8000",
+                     "--timeout-keep-alive",
+                     "60",
+                     "--no-access-log"
+                 ],
+        "State":  {
+                      "Status":  "running",
+                      "Running":  true,
+                      "Paused":  false,
+                      "Restarting":  false,
+                      "OOMKilled":  false,
+                      "Dead":  false,
+                      "Pid":  10730,
+                      "ExitCode":  0,
+                      "Error":  "",
+                      "StartedAt":  "2026-10-08T20:44:26.692644418Z",
+                      "FinishedAt":  "0001-01-01T00:00:00Z",
+                      "Health":  {
+                                     "Status":  "healthy",
+                                     "FailingStreak":  0,
+                                     "Log":  [
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:21.107581107Z",
+                                                     "End":  "2026-10-08T20:46:21.40440053Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:26.404937144Z",
+                                                     "End":  "2026-10-08T20:46:26.7017591Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:31.702238889Z",
+                                                     "End":  "2026-10-08T20:46:32.009500576Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:37.009044028Z",
+                                                     "End":  "2026-10-08T20:46:37.298596976Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 },
+                                                 {
+                                                     "Start":  "2026-10-08T20:46:42.299970975Z",
+                                                     "End":  "2026-10-08T20:46:42.412186347Z",
+                                                     "ExitCode":  0,
+                                                     "Output":  ""
+                                                 }
+                                             ]
+                                 }
+                  },
+        "Image":  "sha256:96393492d3b65fea3298d38bd419a000bcdb1724fea68a60b699244678f6f2f4",
+        "ResolvConfPath":  "/var/lib/docker/containers/a0d0c09dfa3ef219e5d43abf40363cf463b84fc19a0ed54874017aec283a7717/resolv.conf",
+        "HostnamePath":  "/var/lib/docker/containers/a0d0c09dfa3ef219e5d43abf40363cf463b84fc19a0ed54874017aec283a7717/hostname",
+        "HostsPath":  "/var/lib/docker/containers/a0d0c09dfa3ef219e5d43abf40363cf463b84fc19a0ed54874017aec283a7717/hosts",
+        "LogPath":  "",
+        "Name":  "/carga-local-extractor-5",
+        "RestartCount":  0,
+        "Driver":  "overlayfs",
+        "Platform":  "linux",
+        "MountLabel":  "",
+        "ProcessLabel":  "",
+        "AppArmorProfile":  "",
+        "ExecIDs":  null,
+        "HostConfig":  {
+                           "Binds":  null,
+                           "ContainerIDFile":  "",
+                           "LogConfig":  {
+                                             "Type":  "local",
+                                             "Config":  {
+
+                                                        }
+                                         },
+                           "NetworkMode":  "carga-local_default",
+                           "PortBindings":  {
+
+                                            },
+                           "RestartPolicy":  {
+                                                 "Name":  "unless-stopped",
+                                                 "MaximumRetryCount":  0
+                                             },
+                           "AutoRemove":  false,
+                           "VolumeDriver":  "",
+                           "VolumesFrom":  null,
+                           "ConsoleSize":  [
+                                               0,
+                                               0
+                                           ],
+                           "CapAdd":  null,
+                           "CapDrop":  null,
+                           "CgroupnsMode":  "private",
+                           "Dns":  null,
+                           "DnsOptions":  null,
+                           "DnsSearch":  null,
+                           "ExtraHosts":  [
+
+                                          ],
+                           "GroupAdd":  null,
+                           "IpcMode":  "private",
+                           "Cgroup":  "",
+                           "Links":  null,
+                           "OomScoreAdj":  0,
+                           "PidMode":  "",
+                           "Privileged":  false,
+                           "PublishAllPorts":  false,
+                           "ReadonlyRootfs":  false,
+                           "SecurityOpt":  null,
+                           "UTSMode":  "",
+                           "UsernsMode":  "",
+                           "ShmSize":  67108864,
+                           "Runtime":  "runc",
+                           "Isolation":  "",
+                           "CpuShares":  0,
+                           "Memory":  1073741824,
+                           "NanoCpus":  1000000000,
+                           "CgroupParent":  "",
+                           "BlkioWeight":  0,
+                           "BlkioWeightDevice":  null,
+                           "BlkioDeviceReadBps":  null,
+                           "BlkioDeviceWriteBps":  null,
+                           "BlkioDeviceReadIOps":  null,
+                           "BlkioDeviceWriteIOps":  null,
+                           "CpuPeriod":  0,
+                           "CpuQuota":  0,
+                           "CpuRealtimePeriod":  0,
+                           "CpuRealtimeRuntime":  0,
+                           "CpusetCpus":  "",
+                           "CpusetMems":  "",
+                           "Devices":  null,
+                           "DeviceCgroupRules":  null,
+                           "DeviceRequests":  null,
+                           "MemoryReservation":  0,
+                           "MemorySwap":  2147483648,
+                           "MemorySwappiness":  null,
+                           "OomKillDisable":  null,
+                           "PidsLimit":  null,
+                           "Ulimits":  null,
+                           "CpuCount":  0,
+                           "CpuPercent":  0,
+                           "IOMaximumIOps":  0,
+                           "IOMaximumBandwidth":  0,
+                           "MaskedPaths":  [
+                                               "/proc/acpi",
+                                               "/proc/asound",
+                                               "/proc/interrupts",
+                                               "/proc/kcore",
+                                               "/proc/keys",
+                                               "/proc/latency_stats",
+                                               "/proc/sched_debug",
+                                               "/proc/scsi",
+                                               "/proc/timer_list",
+                                               "/proc/timer_stats",
+                                               "/sys/devices/virtual/powercap",
+                                               "/sys/firmware"
+                                           ],
+                           "ReadonlyPaths":  [
+                                                 "/proc/bus",
+                                                 "/proc/fs",
+                                                 "/proc/irq",
+                                                 "/proc/sys",
+                                                 "/proc/sysrq-trigger"
+                                             ]
+                       },
+        "Storage":  {
+                        "RootFS":  {
+                                       "Snapshot":  {
+                                                        "Name":  "overlayfs"
+                                                    }
+                                   }
+                    },
+        "Mounts":  [
+
+                   ],
+        "Config":  {
+                       "Hostname":  "a0d0c09dfa3e",
+                       "Domainname":  "",
+                       "User":  "",
+                       "AttachStdin":  false,
+                       "AttachStdout":  true,
+                       "AttachStderr":  true,
+                       "ExposedPorts":  {
+                                            "8000/tcp":  {
+
+                                                         }
+                                        },
+                       "Tty":  false,
+                       "OpenStdin":  false,
+                       "StdinOnce":  false,
+                       "Env":  [
+                                   "QUEUE_TIMEOUT_S",
+                                   "REQUEST_TIMEOUT_S",
+                                   "PATH=/app/.venv/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                                   "LANG=C.UTF-8",
+                                   "GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305",
+                                   "PYTHON_VERSION=3.12.15",
+                                   "PYTHON_SHA256=c2c4321961fab0fb999d66e0cecf521c2ab3994c7992873ea99e306c1094fd5a",
+                                   "PYTHONUNBUFFERED=1",
+                                   "UV_COMPILE_BYTECODE=1",
+                                   "UV_LINK_MODE=copy"
+                               ],
+                       "Cmd":  [
+                                   "uvicorn",
+                                   "extractor_service.main:app",
+                                   "--host",
+                                   "0.0.0.0",
+                                   "--port",
+                                   "8000",
+                                   "--timeout-keep-alive",
+                                   "60",
+                                   "--no-access-log"
+                               ],
+                       "Healthcheck":  {
+                                           "Test":  [
+                                                        "CMD",
+                                                        "python",
+                                                        "-c",
+                                                        "import urllib.request; urllib.request.urlopen(\u0027http://localhost:8000/health\u0027)"
+                                                    ],
+                                           "Interval":  5000000000,
+                                           "Timeout":  3000000000,
+                                           "Retries":  5
+                                       },
+                       "Image":  "carga-local-extractor",
+                       "Volumes":  null,
+                       "WorkingDir":  "/app",
+                       "Entrypoint":  null,
+                       "Labels":  {
+                                      "com.docker.compose.config-hash":  "a1a6a82919d502cacc38a63d9c268f932dd98e0e7fbe0d21da267726a0a8c92d",
+                                      "com.docker.compose.container-number":  "5",
+                                      "com.docker.compose.depends_on":  "",
+                                      "com.docker.compose.image":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                      "com.docker.compose.oneoff":  "False",
+                                      "com.docker.compose.project":  "carga-local",
+                                      "com.docker.compose.project.config_files":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.yml,C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor\\docker-compose.profesor.yml",
+                                      "com.docker.compose.project.working_dir":  "C:\\Users\\Augusto\\Documents\\repo\\pdf-extractext\\pdf-extractext\\.test-extractor",
+                                      "com.docker.compose.replace":  "extractor-5",
+                                      "com.docker.compose.service":  "extractor",
+                                      "com.docker.compose.version":  "5.5.1"
+                                  }
+                   },
+        "NetworkSettings":  {
+                                "SandboxID":  "babff77e0ace0163c16c1f34598632a9b23cdc70927c07799a6d60380eca5525",
+                                "SandboxKey":  "/var/run/docker/netns/babff77e0ace",
+                                "Ports":  {
+                                              "8000/tcp":  null
+                                          },
+                                "Networks":  {
+                                                 "carga-local_default":  {
+                                                                             "IPAMConfig":  null,
+                                                                             "Links":  null,
+                                                                             "Aliases":  [
+                                                                                             "carga-local-extractor-5",
+                                                                                             "extractor"
+                                                                                         ],
+                                                                             "DriverOpts":  null,
+                                                                             "GwPriority":  0,
+                                                                             "NetworkID":  "307e2322335fac3e514d3b5da7d04fb9c789ca329a818244a753319d2653fc05",
+                                                                             "EndpointID":  "14ffb374917e54ff96b6061bd55876a08840a0a618ab29d71df8957525665805",
+                                                                             "Gateway":  "172.19.0.1",
+                                                                             "IPAddress":  "172.19.0.4",
+                                                                             "MacAddress":  "46:7b:af:27:25:ba",
+                                                                             "IPPrefixLen":  16,
+                                                                             "IPv6Gateway":  "",
+                                                                             "GlobalIPv6Address":  "",
+                                                                             "GlobalIPv6PrefixLen":  0,
+                                                                             "DNSNames":  [
+                                                                                              "carga-local-extractor-5",
+                                                                                              "extractor",
+                                                                                              "a0d0c09dfa3e"
+                                                                                          ]
+                                                                         }
+                                             }
+                            },
+        "ImageManifestDescriptor":  {
+                                        "mediaType":  "application/vnd.oci.image.manifest.v1+json",
+                                        "digest":  "sha256:8df353425884a2c6489dfe418ce6b4d69126598aaa317c2bf1dd5f0e432aa4d3",
+                                        "size":  2008,
+                                        "platform":  {
+                                                         "architecture":  "amd64",
+                                                         "os":  "linux"
+                                                     }
+                                    }
+    }
+]

@@ -1,0 +1,1 @@
+/carga-k6-corregida-1 CPU=2000000000 MEM=3221225472 OOM=false

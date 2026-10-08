@@ -5,6 +5,7 @@ Lee variables de entorno y del archivo .env usando pydantic-settings.
 Todas las demás partes de la app deben importar ``settings`` desde aquí;
 nunca leer os.environ directamente en otros módulos.
 """
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -48,8 +49,12 @@ class Settings(BaseSettings):
     MONGODB_TEST_DB_NAME: str = "pdf_extractext_test"
 
     # ── Validación de PDF ─────────────────────────────────────────
-    MAX_FILE_SIZE_MB: int = 10
+    MAX_FILE_SIZE_MB: int = Field(default=10, gt=0)
     PDF_ALLOWED_MIME_TYPE: str = "application/pdf"
+
+    # Servicio HTTP externo; el nombre extractor es resuelto por Docker Compose.
+    EXTRACTOR_URL: str = "http://extractor-lb/extract"
+    EXTRACTOR_TIMEOUT_SECONDS: float = Field(default=30.0, gt=0)
 
     # ── CORS ──────────────────────────────────────────────────────
     # Lista de orígenes separados por coma. "*" (por defecto) sólo es
