@@ -23,12 +23,18 @@
 | **FastAPI** | Framework web / API REST |
 | **uv** | Gestor de paquetes y entornos virtuales |
 | **MongoDB** | Base de datos no relacional (driver asíncrono `motor`) |
-| **pypdf** | Extracción de texto y metadatos desde PDFs |
+| **httpx** | Cliente asíncrono con conexiones reutilizables al extractor |
+| **pypdf** | Lectura opcional de metadatos; el texto se extrae en el microservicio externo |
 | **pytest** | Testing (TDD) |
 
 ---
 
 ## Arquitectura del Proyecto
+
+Esta rama utiliza el [extractor optimizado](https://github.com/AugustoZz/pdf-extractext-extractor/tree/perf/carga-limpio),
+fork del repositorio de valendotjpg. Docker Compose fija el commit
+`492646ed9ab7a949019b16dbab021eefc2eddce9` para reproducir la versión probada.
+Con `EXTRACTOR_BUILD_CONTEXT` se puede seleccionar otra copia del extractor.
 
 ```
 pdf-extractext/
@@ -43,7 +49,7 @@ pdf-extractext/
 │   ├── infrastructure/         # Capa de infraestructura
 │   │   └── database/           # Conexión y operaciones MongoDB
 │   └── services/               # Lógica de negocio
-│       └── extractor/          # Servicio de extracción de texto PDF
+│       └── extractor/          # Cliente HTTP del extractor y lectura de metadatos
 │
 ├── frontend/                   # Cliente web estático (servido en /web)
 │
@@ -53,9 +59,12 @@ pdf-extractext/
 │
 ├── docs/                       # Documentación del proyecto
 ├── .env.example                # Variables de entorno requeridas (12-Factor)
-├── requirements.txt            # Dependencias del proyecto
+├── pyproject.toml              # Dependencias y grupo de desarrollo para uv
+├── uv.lock                     # Versiones exactas reproducibles
+├── requirements.txt            # Export compatible generado desde uv.lock
 ├── Dockerfile                  # Imagen de la aplicación
 ├── docker-compose.yml          # Orquestación API + MongoDB + extractor
+├── nginx/extractor.conf        # Balanceador HTTP hacia las cinco réplicas
 └── README.md
 ```
 ---
@@ -65,7 +74,7 @@ pdf-extractext/
 ### Requisitos previos
 - Python 3.11+
 - [uv](https://github.com/astral-sh/uv) instalado
-- MongoDB en ejecución (o usar la Opción 2 con Docker)
+- MongoDB y extractor HTTP en ejecución (o usar la Opción 2 con Docker)
 
 ### Pasos (Opción 1: Local con uv)
 
@@ -75,11 +84,12 @@ git clone https://github.com/AugustoZz/pdf-extractext.git
 cd pdf-extractext
 
 # 2. Crear entorno virtual e instalar dependencias
-uv venv
-uv pip install -r requirements.txt
+uv sync --frozen
 
 # 3. Configurar variables de entorno
 cp .env.example .env
+# Para ejecutar la API fuera de Docker, configurar EXTRACTOR_URL en .env
+# con la URL publicada del extractor, por ejemplo http://localhost:8080/extract.
 
 # 4. Ejecutar la aplicación
 uv run python main.py
@@ -97,10 +107,13 @@ Para evaluar el proyecto sin instalar Python o MongoDB localmente:
 git clone https://github.com/AugustoZz/pdf-extractext.git
 cd pdf-extractext
 
-# 2. Levantar la base de datos y la API
+# 2. Levantar MongoDB, la API y las cinco réplicas del extractor
 docker compose up --build
 ```
 La API estará lista y conectada a la base de datos automáticamente en `http://localhost:8000`.
+El extractor balanceado queda publicado en `http://localhost:8080/extract`.
+Docker Compose inicia la API sin watcher de recarga para evitar consumir CPU
+vigilando los PDFs y resultados; tras editar código, usar `docker compose restart api`.
 Si algún puerto ya está en uso en tu máquina, cambialo en `.env` (ver la sección Docker Compose de `.env.example`).
 
 ---
@@ -124,6 +137,12 @@ uv run pytest tests/integration/
 uv run pytest --cov=app
 ```
 
+También se puede ejecutar toda la suite desde Docker, sin Python en el host:
+
+```bash
+docker compose exec api uv run --frozen pytest
+```
+
 > **Base de datos de test.** Las pruebas de integración borran la colección
 > `documents` antes y después de cada test. Por eso se conectan a una base
 > **separada**, definida en `MONGODB_TEST_DB_NAME` (por defecto
@@ -142,11 +161,26 @@ Cada microservicio vive en su propio repositorio:
 | **extractor** | [pdf-extractext-extractor](https://github.com/valendotjpg/pdf-extractext-extractor) | Recibe un PDF y devuelve su texto en Markdown |
 
 `docker compose up --build` construye el extractor directamente desde su repositorio
-(5 réplicas). Dentro de la red de Compose responde en `http://extractor:8000/extract`.
+(5 réplicas). Dentro de la red de Compose el balanceador responde en
+`http://extractor-lb/extract` y distribuye cada solicitud con `least_conn`.
+
+La API de documentos envía el PDF binario al extractor mediante `httpx.AsyncClient`
+y reutiliza las conexiones. Guarda su `content` como `text` (Markdown), conserva
+`page_count`, checksum y metadatos y evita repetir la extracción de texto con pypdf.
+Los errores 422, 413 y 503 del extractor se propagan; los errores de conexión devuelven
+503 y una respuesta externa inválida devuelve 502. No se persiste un documento si
+falló la extracción.
+
+`EXTRACTOR_URL` y `EXTRACTOR_TIMEOUT_SECONDS` permiten conectar otro despliegue
+(por defecto `http://extractor-lb/extract`). Para probar una copia local optimizada
+del servicio, configurar `EXTRACTOR_BUILD_CONTEXT=./.test-extractor` en `.env`;
+por defecto se usa el repositorio remoto. La copia local debe existir antes del build.
 
 El TP de **Test de Carga, Estrés y Optimización** se entrega en el repositorio del
 extractor: ahí están las pruebas con k6 y Vegeta, el informe, la evidencia de la corrida
 final y el contrato del servicio.
+
+El [informe resumido](docs/refactor-2026-10-08.md) documenta las mejoras, los tests y los resultados. La evidencia mínima está en el repositorio del extractor; los reportes completos permanecen en la rama de respaldo.
 
 ---
 
@@ -167,8 +201,15 @@ Códigos de respuesta relevantes de `POST /api/v1/extract`:
 | `201` | Documento extraído y guardado |
 | `400` | El archivo no tiene extensión `.pdf` |
 | `409` | Ya existe un documento con el mismo checksum |
-| `415` | El cliente declaró un `content-type` distinto de `application/pdf` |
-| `422` | El PDF es inválido, está corrupto o supera `MAX_FILE_SIZE_MB` |
+| `413` | El archivo supera `MAX_FILE_SIZE_MB` |
+| `415` | El cliente declaró un MIME incompatible con PDF (se acepta MIME vacío o genérico) |
+| `422` | El PDF es inválido, está corrupto o tiene contraseña |
+| `503` | El extractor está saturado, no responde o no está disponible |
+| `502` | El extractor devolvió una respuesta inesperada o inválida |
+
+El índice único de checksum es obligatorio al arrancar. Si hay duplicados previos
+o MongoDB no puede crearlo, la API falla al iniciar: corregir el problema e iniciar
+nuevamente garantiza que las subidas concurrentes no generen duplicados.
 
 ---
 
@@ -189,7 +230,7 @@ Códigos de respuesta relevantes de `POST /api/v1/extract`:
 | Factor | Implementación |
 |--------|----------------|
 | **I. Codebase** | Un repositorio Git, múltiples deploys |
-| **II. Dependencies** | `requirements.txt` + `uv` — dependencias declaradas explícitamente |
+| **II. Dependencies** | `pyproject.toml` + `uv.lock` + `uv sync --frozen` |
 | **III. Config** | Variables de entorno vía `.env` (nunca en código) |
 | **IV. Backing Services** | MongoDB como recurso adjunto configurable |
 | **V. Build/Release/Run** | Separación clara usando Docker y Docker Compose |

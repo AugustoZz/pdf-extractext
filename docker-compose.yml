@@ -9,10 +9,12 @@ services:
       - MONGODB_URI=mongodb://mongodb:27017
       - MONGODB_DB_NAME=pdf_extractext
       - APP_NAME=pdf-extractext
-      - APP_ENV=development
+      - APP_ENV=${APP_ENV:-production}
       - LOG_LEVEL=INFO
       - MAX_FILE_SIZE_MB=10
       - PDF_ALLOWED_MIME_TYPE=application/pdf
+      - EXTRACTOR_URL=${EXTRACTOR_URL:-http://extractor-lb/extract}
+      - EXTRACTOR_TIMEOUT_SECONDS=${EXTRACTOR_TIMEOUT_SECONDS:-30}
     depends_on:
       mongodb:
         # service_healthy (y no service_started) porque la API verifica la
@@ -20,11 +22,13 @@ services:
         # "started" sólo garantiza que el contenedor arrancó, no que mongod
         # haya terminado de inicializarse.
         condition: service_healthy
+      extractor-lb:
+        condition: service_started
     volumes:
-      # Sincroniza el código fuente para recarga en vivo (hot reload)
+      # Permite desarrollar sin reconstruir la imagen; reiniciar api tras editar.
       - .:/app
-    # Reinicia uvicorn en modo watch para el desarrollo
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # Sin watcher: la carga no consume CPU vigilando PDFs y archivos de resultados.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     deploy:
       resources:
         # El TP pide límites explícitos en cada contenedor. La api no participa de
@@ -60,10 +64,10 @@ services:
   # Microservicio en su propio repositorio; Compose lo construye desde ahí.
   # Las pruebas de carga, nginx y el informe del TP viven en ese repo:
   # https://github.com/valendotjpg/pdf-extractext-extractor
-  # Sin ports: sólo lo usan los otros servicios, en http://extractor:8000/extract
-  # (el DNS de Docker reparte las peticiones entre las réplicas).
+  # Sin ports: nginx distribuye las peticiones entre las cinco replicas.
   extractor:
-    build: https://github.com/valendotjpg/pdf-extractext-extractor.git#main
+    build: ${EXTRACTOR_BUILD_CONTEXT:-https://github.com/AugustoZz/pdf-extractext-extractor.git#492646ed9ab7a949019b16dbab021eefc2eddce9}
+    command: uvicorn extractor_service.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 60 --no-access-log
     deploy:
       # El TP permite hasta 5 réplicas.
       replicas: ${EXTRACTOR_REPLICAS:-5}
@@ -76,6 +80,22 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+    restart: unless-stopped
+
+  extractor-lb:
+    image: nginx:1.27-alpine
+    ports:
+      - "${EXTRACTOR_PORT:-8080}:80"
+    volumes:
+      - ./nginx/extractor.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      extractor:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
     restart: unless-stopped
 
 volumes:

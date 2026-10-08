@@ -38,20 +38,19 @@ class DocumentRepository:
         subidas simultáneas del mismo PDF pueden pasar el chequeo antes de que
         cualquiera de las dos inserte.
         """
-        # Cada índice va en su propio try: que falle el único no debe impedir
-        # que se cree el de fecha.
+        # El índice único es obligatorio: sin él no hay garantía contra
+        # duplicados concurrentes. No se acepta tráfico si falla su creación.
         try:
             await cls._collection().create_index("checksum", unique=True, name="uq_checksum")
             logger.info("Índice único sobre 'checksum' verificado.")
         except PyMongoError as exc:
-            # No abortamos el arranque: lo más probable es que ya existan
-            # documentos duplicados de antes de introducir el índice.
             logger.error(
                 "No se pudo crear el índice único sobre 'checksum': %s. "
                 "Es probable que existan duplicados previos en la colección; "
                 "limpialos y reiniciá la aplicación.",
                 exc,
             )
+            raise
 
         # Soporta el orden por fecha del listado sin recorrer la colección.
         try:
@@ -65,7 +64,7 @@ class DocumentRepository:
     @classmethod
     async def get_by_checksum(cls, checksum: str) -> Optional[dict]:
         """Busca un documento por su checksum (para evitar duplicados)."""
-        doc = await cls._collection().find_one({"checksum": checksum})
+        doc = await cls._collection().find_one({"checksum": checksum}, LIST_PROJECTION)
         if doc:
             doc["id"] = str(doc.pop("_id"))
         return doc
@@ -74,7 +73,11 @@ class DocumentRepository:
     async def create(cls, data: dict) -> dict:
         """Crea un nuevo documento en la base de datos."""
         result = await cls._collection().insert_one(data)
-        return await cls.get_by_id(str(result.inserted_id))
+        # insert_one ya confirma la escritura. Evitar volver a traer todo el
+        # texto desde MongoDB sólo para devolver el documento recién insertado.
+        saved = {key: value for key, value in data.items() if key != "_id"}
+        saved["id"] = str(result.inserted_id)
+        return saved
 
     @classmethod
     async def get_by_id(cls, doc_id: str) -> Optional[dict]:
