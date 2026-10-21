@@ -31,8 +31,8 @@
 
 ## Arquitectura del Proyecto
 
-Esta rama utiliza el [extractor optimizado](https://github.com/AugustoZz/pdf-extractext-extractor/tree/perf/carga-limpio),
-fork del repositorio de valendotjpg. Docker Compose fija el commit
+Esta rama utiliza el [extractor optimizado](https://github.com/valendotjpg/pdf-extractext-extractor),
+el repositorio propio del microservicio. Docker Compose fija el commit
 `492646ed9ab7a949019b16dbab021eefc2eddce9` para reproducir la versión probada.
 Con `EXTRACTOR_BUILD_CONTEXT` se puede seleccionar otra copia del extractor.
 

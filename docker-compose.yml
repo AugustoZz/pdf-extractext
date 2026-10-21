@@ -66,7 +66,7 @@ services:
   # https://github.com/valendotjpg/pdf-extractext-extractor
   # Sin ports: nginx distribuye las peticiones entre las cinco replicas.
   extractor:
-    build: ${EXTRACTOR_BUILD_CONTEXT:-https://github.com/AugustoZz/pdf-extractext-extractor.git#492646ed9ab7a949019b16dbab021eefc2eddce9}
+    build: ${EXTRACTOR_BUILD_CONTEXT:-https://github.com/valendotjpg/pdf-extractext-extractor.git#492646ed9ab7a949019b16dbab021eefc2eddce9}
     command: uvicorn extractor_service.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 60 --no-access-log
     deploy:
       # El TP permite hasta 5 réplicas.
