@@ -56,10 +56,10 @@ def _validate_upload(file: UploadFile) -> None:
         )
 
 
-async def _extract_document(file_bytes: bytes) -> ExtractedDocument:
+async def _extract_document(file_bytes: bytes, *, with_metadata: bool = True) -> ExtractedDocument:
     """Extrae el documento y traduce los fallos del extractor a códigos HTTP."""
     try:
-        return await _service.extract(file_bytes)
+        return await _service.extract(file_bytes, with_metadata=with_metadata)
     except PDFTooLargeError as exc:
         raise HTTPException(status_code=413, detail=str(exc)) from exc
     except PDFValidationError as exc:
@@ -178,6 +178,7 @@ async def extract_compat(request: Request):
         # Body binario directo: es el formato de los scripts de la cátedra.
         file_bytes = await _read_bounded_body(request, _MAX_FILE_BYTES)
 
-    doc = await _extract_document(file_bytes)
+    # El alias no devuelve metadatos: no se relee el PDF con pypdf.
+    doc = await _extract_document(file_bytes, with_metadata=False)
     return {"content": doc.text, "page_count": doc.page_count}
 

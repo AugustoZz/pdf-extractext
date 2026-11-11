@@ -41,6 +41,8 @@ def test_extract_compat_raw_binary_returns_contract(mock_service, mock_repo):
     assert response.json() == {"content": "# Título\n\nTexto", "page_count": 3}
     # El alias no persiste: el CRUD sigue en /api/v1/extract.
     mock_repo.create.assert_not_called()
+    # Ni lee metadatos: no los devuelve y releer el PDF es CPU de la API.
+    mock_service.extract.assert_awaited_once_with(b"%PDF-1.4...", with_metadata=False)
 
 
 def test_extract_compat_multipart_returns_contract(mock_service, mock_repo):
