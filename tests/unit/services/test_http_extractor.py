@@ -77,3 +77,32 @@ async def test_invalid_pdf_header_never_contacts_extractor():
         service = HTTPPDFExtractorService("http://extractor/extract", client=client)
         with pytest.raises(PDFValidationError):
             await service.extract(b"not a pdf")
+
+
+@pytest.mark.asyncio
+async def test_without_metadata_does_not_reread_the_pdf():
+    async with httpx.AsyncClient(transport=httpx.MockTransport(lambda request: httpx.Response(200, json={"content": "Texto", "page_count": 1}))) as client:
+        service = HTTPPDFExtractorService("http://extractor/extract", client=client)
+        service._metadata_reader = MagicMock()
+        result = await service.extract(b"%PDF-test", with_metadata=False)
+    assert result.text == "Texto"
+    assert result.metadata == {}
+    service._metadata_reader.extract_metadata.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_validation_error_keeps_the_extractor_detail():
+    detail = "El archivo PDF está protegido con contraseña y no se puede procesar."
+    async with httpx.AsyncClient(transport=httpx.MockTransport(lambda request: httpx.Response(422, json={"detail": detail}))) as client:
+        service = HTTPPDFExtractorService("http://extractor/extract", client=client)
+        with pytest.raises(PDFValidationError, match="contraseña"):
+            await service.extract(b"%PDF-test")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("response", [httpx.Response(422), httpx.Response(422, json=["no es un dict"]), httpx.Response(422, json={"detail": ["lista"]})])
+async def test_validation_error_without_usable_detail_uses_generic_message(response):
+    async with httpx.AsyncClient(transport=httpx.MockTransport(lambda request: response)) as client:
+        service = HTTPPDFExtractorService("http://extractor/extract", client=client)
+        with pytest.raises(PDFValidationError, match="inválido"):
+            await service.extract(b"%PDF-test")

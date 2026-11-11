@@ -22,6 +22,15 @@ class ExtractorHTTPError(RuntimeError):
         self.status_code = status_code
 
 
+def _remote_detail(response: httpx.Response) -> str | None:
+    """El ``detail`` del extractor (p. ej. "protegido con contraseña"), si vino uno."""
+    try:
+        detail = response.json().get("detail")
+    except (ValueError, AttributeError):
+        return None
+    return detail if isinstance(detail, str) and detail.strip() else None
+
+
 class HTTPPDFExtractorService:
     """Extrae Markdown por HTTP; conserva metadatos locales sin extraer texto."""
 
@@ -52,7 +61,13 @@ class HTTPPDFExtractorService:
             await self._client.aclose()
             self._client = None
 
-    async def extract(self, file_bytes: bytes) -> ExtractedDocument:
+    async def extract(self, file_bytes: bytes, *, with_metadata: bool = True) -> ExtractedDocument:
+        """
+        Envía el PDF al extractor y devuelve su Markdown.
+
+        Con ``with_metadata=False`` no se relee el PDF con pypdf: el alias
+        ``POST /extract`` descarta los metadatos y esa lectura es CPU de la API.
+        """
         if len(file_bytes) > self._max_bytes:
             raise PDFTooLargeError("El archivo supera el tamaño máximo permitido.")
         if not file_bytes.startswith(b"%PDF"):
@@ -72,7 +87,10 @@ class HTTPPDFExtractorService:
 
         if response.status_code != 200:
             if response.status_code == 422:
-                raise PDFValidationError("El PDF es inválido, está corrupto o tiene contraseña.")
+                raise PDFValidationError(
+                    _remote_detail(response)
+                    or "El PDF es inválido, está corrupto o tiene contraseña."
+                )
             if response.status_code == 413:
                 raise PDFTooLargeError("El archivo supera el tamaño máximo permitido.")
             if response.status_code == 503:
@@ -90,6 +108,9 @@ class HTTPPDFExtractorService:
             or payload["page_count"] < 1
         ):
             raise ExtractorHTTPError("El extractor devolvió un resultado inválido.", 502)
+
+        if not with_metadata:
+            return ExtractedDocument(payload["content"], payload["page_count"], {})
 
         # El contrato del extractor incluye content/page_count. Leer sólo los
         # metadatos mantiene el contrato de documentos sin repetir la costosa

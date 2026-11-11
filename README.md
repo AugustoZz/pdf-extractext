@@ -225,6 +225,10 @@ El [informe resumido](docs/refactor-2026-10-08.md) documenta las mejoras, los te
 | `PUT` | `/api/v1/documents/{id}` | Actualizar documento (`filename`, `text`, `metadata`) |
 | `DELETE` | `/api/v1/documents/{id}` | Eliminar documento |
 
+> **Sin autenticación:** la API no tiene usuarios ni permisos; cualquiera que
+> alcance el puerto puede crear, editar y borrar documentos. Está fuera del alcance
+> del TP; para exponerla fuera de una red de confianza habría que agregar autenticación.
+
 > `POST /extract` es sólo un alias de compatibilidad con el contrato del TP de
 > carga y estrés (el microservicio evaluado sigue siendo el repositorio del
 > extractor). No reemplaza a `/api/v1/extract` ni persiste documentos.
