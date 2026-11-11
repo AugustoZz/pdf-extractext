@@ -1,4 +1,5 @@
-FROM python:3.11-slim
+# Versión fija: evita que un rebuild use otra imagen base sin avisar.
+FROM python:3.11.18-slim
 COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /bin/uv
 
 # Establecer directorio de trabajo

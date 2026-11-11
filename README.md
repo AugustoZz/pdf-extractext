@@ -137,6 +137,35 @@ uv run pytest tests/integration/
 uv run pytest --cov=app
 ```
 
+En Windows también se puede ejecutar cada parte mediante el script de
+PowerShell:
+
+```powershell
+# Toda la suite
+.\scripts\test.ps1 -Part all
+
+# Por componente
+.\scripts\test.ps1 -Part api
+.\scripts\test.ps1 -Part services
+.\scripts\test.ps1 -Part extractor
+.\scripts\test.ps1 -Part database
+
+# Cobertura HTML en htmlcov\index.html
+.\scripts\test.ps1 -Part coverage
+```
+
+Las pruebas de integración requieren MongoDB. Si los servicios están levantados
+con Docker Compose, se pueden ejecutar dentro del contenedor de la API:
+
+```powershell
+.\scripts\test.ps1 -Part integration -Docker
+```
+
+El script usa `uv` cuando está disponible y, en caso contrario, intenta usar
+`python -m pytest`. Si ninguna de las dos instalaciones tiene las dependencias
+del proyecto, instalar el grupo de desarrollo con `uv sync` o ejecutar las
+pruebas desde Docker.
+
 También se puede ejecutar toda la suite desde Docker, sin Python en el host:
 
 ```bash
@@ -189,10 +218,16 @@ El [informe resumido](docs/refactor-2026-10-08.md) documenta las mejoras, los te
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | `POST` | `/api/v1/extract` | Subir un PDF, extraer su texto y persistirlo |
+| `POST` | `/extract` | Alias compatible con el TP de carga: PDF binario en el body (o multipart) → `200 {"content", "page_count"}`, sin persistir |
+| `GET` | `/health` | Liveness probe (`{"status": "ok"}`); no toca la base ni el extractor |
 | `GET` | `/api/v1/documents` | Listar documentos, del más reciente al más antiguo (paginado con `skip` y `limit`). **No incluye el campo `text`** |
 | `GET` | `/api/v1/documents/{id}` | Obtener documento por ID |
 | `PUT` | `/api/v1/documents/{id}` | Actualizar documento (`filename`, `text`, `metadata`) |
 | `DELETE` | `/api/v1/documents/{id}` | Eliminar documento |
+
+> `POST /extract` es sólo un alias de compatibilidad con el contrato del TP de
+> carga y estrés (el microservicio evaluado sigue siendo el repositorio del
+> extractor). No reemplaza a `/api/v1/extract` ni persiste documentos.
 
 Códigos de respuesta relevantes de `POST /api/v1/extract`:
 
@@ -246,7 +281,7 @@ nuevamente garantiza que las subidas concurrentes no generen duplicados.
 
 ## Plazo de Entrega
 
-**23/05/2025** — Etapa N°1
+**23/05/2026** — Etapa N°1
 
 ---
 

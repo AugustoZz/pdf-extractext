@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 
 from app.api.v1 import router as v1_router
-from app.api.v1.endpoints.extract import _service as extractor_service
+from app.api.v1.endpoints.extract import compat_router, _service as extractor_service
 from app.core.config import settings
 from app.infrastructure.database.connection import connect_to_mongo, close_mongo_connection
 from app.infrastructure.database.repository import DocumentRepository
@@ -79,6 +79,15 @@ app.add_middleware(
 
 # Montar rutas de la API v1 en /api/v1
 app.include_router(v1_router, prefix="/api/v1")
+
+# Alias sin prefijo para el contrato del TP de carga (POST /extract).
+app.include_router(compat_router)
+
+
+@app.get("/health", tags=["Health"])
+def health():
+    """Liveness probe: no toca la base ni el extractor a propósito."""
+    return {"status": "ok"}
 
 
 @app.get("/", tags=["Health"])

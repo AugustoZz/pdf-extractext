@@ -5,17 +5,23 @@ POST /api/v1/extract → JSON con texto, metadatos, checksum y páginas.
 """
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pymongo.errors import DuplicateKeyError
+from starlette.datastructures import UploadFile as StarletteUploadFile
 
 from app.core.config import settings
 from app.infrastructure.database.repository import DocumentRepository
 from app.services.extractor import PDFValidationError, PDFTooLargeError
 from app.services.extractor.http_extractor import HTTPPDFExtractorService, ExtractorHTTPError
+from app.services.extractor.models import ExtractedDocument
 from app.services.checksum import calculate_checksum
 
 router = APIRouter()
+
+# Ruta de compatibilidad con el contrato del TP de carga (POST /extract).
+# No lleva prefijo /api/v1 y no se publica en el OpenAPI del servicio de documentos.
+compat_router = APIRouter()
 _service = HTTPPDFExtractorService(
     url=settings.EXTRACTOR_URL,
     timeout_seconds=settings.EXTRACTOR_TIMEOUT_SECONDS,
@@ -48,6 +54,18 @@ def _validate_upload(file: UploadFile) -> None:
             status_code=415,
             detail=f"El content-type declarado debe ser {settings.PDF_ALLOWED_MIME_TYPE}.",
         )
+
+
+async def _extract_document(file_bytes: bytes) -> ExtractedDocument:
+    """Extrae el documento y traduce los fallos del extractor a códigos HTTP."""
+    try:
+        return await _service.extract(file_bytes)
+    except PDFTooLargeError as exc:
+        raise HTTPException(status_code=413, detail=str(exc)) from exc
+    except PDFValidationError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except ExtractorHTTPError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
 
 
 @router.post(
@@ -88,14 +106,7 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
         raise HTTPException(status_code=409, detail=_DUPLICATE_DETAIL)
 
     # 4. Procesar y extraer texto
-    try:
-        doc = await _service.extract(file_bytes)
-    except PDFTooLargeError as exc:
-        raise HTTPException(status_code=413, detail=str(exc)) from exc
-    except PDFValidationError as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
-    except ExtractorHTTPError as exc:
-        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+    doc = await _extract_document(file_bytes)
 
     # 5. Guardar en Base de Datos
     data_to_insert = {
@@ -114,4 +125,59 @@ async def extract_pdf(file: UploadFile = File(..., description="Archivo PDF a pr
         raise HTTPException(status_code=409, detail=_DUPLICATE_DETAIL) from exc
 
     return JSONResponse(status_code=201, content=saved_doc)
+
+
+async def _read_bounded_body(request: Request, limit: int) -> bytes:
+    """Lee el body binario sin cargar en memoria más de ``limit`` bytes."""
+    body = bytearray()
+    async for chunk in request.stream():
+        if len(body) + len(chunk) > limit:
+            raise HTTPException(
+                status_code=413,
+                detail=f"El archivo supera el tamaño máximo de {settings.MAX_FILE_SIZE_MB} MB.",
+            )
+        body += chunk
+    return bytes(body)
+
+
+@compat_router.post(
+    "/extract",
+    include_in_schema=False,
+    summary="Contrato del TP: PDF binario → {content, page_count}",
+)
+async def extract_compat(request: Request):
+    """
+    Alias compatible con el contrato del TP de carga y estrés.
+
+    Acepta el PDF como body binario (``Content-Type: application/pdf``), igual
+    que los scripts de k6 y Vegeta de la cátedra, o como ``multipart/form-data``
+    con el campo ``file``. Responde 200 con ``{content, page_count}`` y no
+    persiste nada: la extracción con CRUD sigue en ``/api/v1/extract``.
+    """
+    content_type = (request.headers.get("content-type") or "").lower()
+    if content_type.startswith("multipart/form-data"):
+        form = await request.form()
+        upload = form.get("file")
+        if not isinstance(upload, StarletteUploadFile):
+            raise HTTPException(
+                status_code=400,
+                detail="Falta el campo 'file' con el PDF.",
+            )
+        if not upload.filename or not upload.filename.lower().endswith(".pdf"):
+            raise HTTPException(
+                status_code=400,
+                detail="El archivo debe tener extensión .pdf",
+            )
+        file_bytes = await upload.read(_MAX_FILE_BYTES + 1)
+        if len(file_bytes) > _MAX_FILE_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"El archivo supera el tamaño máximo de {settings.MAX_FILE_SIZE_MB} MB.",
+            )
+    else:
+        # Body binario directo: es el formato de los scripts de la cátedra.
+        file_bytes = await _read_bounded_body(request, _MAX_FILE_BYTES)
+
+    doc = await _extract_document(file_bytes)
+    return {"content": doc.text, "page_count": doc.page_count}
 

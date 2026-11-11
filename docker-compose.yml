@@ -29,6 +29,13 @@ services:
       - .:/app
     # Sin watcher: la carga no consume CPU vigilando PDFs y archivos de resultados.
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      # Margen para el arranque: conexión a Mongo e índices.
+      start_period: 15s
     deploy:
       resources:
         # El TP pide límites explícitos en cada contenedor. La api no participa de
@@ -39,7 +46,8 @@ services:
     restart: unless-stopped
 
   mongodb:
-    image: mongo:latest
+    # Versión fija: `latest` puede cambiar entre entregas y romper la reproducibilidad.
+    image: mongo:9.0.4
     ports:
       # Expuesto para los tests de integración que corren desde el host.
       - "${MONGO_PORT:-27017}:27017"
