@@ -31,10 +31,9 @@
 
 ## Arquitectura del Proyecto
 
-Esta rama utiliza el [extractor optimizado](https://github.com/AugustoZz/pdf-extractext-extractor),
+Esta rama utiliza el [extractor optimizado](https://github.com/valendotjpg/pdf-extractext-extractor),
 el repositorio propio del microservicio. Docker Compose fija el commit
 `492646ed9ab7a949019b16dbab021eefc2eddce9` para reproducir la versión probada.
-Ese commit todavía está en la rama `perf/carga-limpio` del extractor, no en su `main`.
 Con `EXTRACTOR_BUILD_CONTEXT` se puede seleccionar otra copia del extractor.
 
 ```
@@ -188,7 +187,7 @@ Cada microservicio vive en su propio repositorio:
 | Servicio | Repositorio | Qué hace |
 |---|---|---|
 | **api** (documentos) | este repositorio | API REST, frontend y persistencia en MongoDB |
-| **extractor** | [pdf-extractext-extractor](https://github.com/AugustoZz/pdf-extractext-extractor) | Recibe un PDF y devuelve su texto en Markdown |
+| **extractor** | [pdf-extractext-extractor](https://github.com/valendotjpg/pdf-extractext-extractor) | Recibe un PDF y devuelve su texto en Markdown |
 
 `docker compose up --build` construye el extractor directamente desde su repositorio
 (5 réplicas). Dentro de la red de Compose el balanceador responde en
