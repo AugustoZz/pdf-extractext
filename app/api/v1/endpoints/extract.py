@@ -3,7 +3,9 @@ Endpoint de extracción de texto desde PDF.
 
 POST /api/v1/extract → JSON con texto, metadatos, checksum y páginas.
 """
+import math
 from datetime import datetime, timezone
+from urllib.parse import urlsplit
 
 from fastapi import APIRouter, File, UploadFile, HTTPException, Request
 from fastapi.responses import JSONResponse
@@ -11,21 +13,45 @@ from pymongo.errors import DuplicateKeyError
 from starlette.datastructures import UploadFile as StarletteUploadFile
 
 from app.core.config import settings
+from app.infrastructure.consul import ConsulServiceResolver, ServiceResolver, StaticURLResolver
 from app.infrastructure.database.repository import DocumentRepository
 from app.services.extractor import PDFValidationError, PDFTooLargeError
 from app.services.extractor.http_extractor import HTTPPDFExtractorService, ExtractorHTTPError
 from app.services.extractor.models import ExtractedDocument
 from app.services.checksum import calculate_checksum
+from app.services.resilience import CircuitBreaker
 
 router = APIRouter()
 
 # Ruta de compatibilidad con el contrato del TP de carga (POST /extract).
 # No lleva prefijo /api/v1 y no se publica en el OpenAPI del servicio de documentos.
 compat_router = APIRouter()
+
+
+def _build_resolver() -> ServiceResolver:
+    """Con Consul, la URL sale del catálogo; EXTRACTOR_URL queda como respaldo."""
+    if not settings.CONSUL_ENABLED:
+        return StaticURLResolver(settings.EXTRACTOR_URL)
+    return ConsulServiceResolver(
+        settings.CONSUL_URL,
+        settings.CONSUL_EXTRACTOR_SERVICE,
+        path=urlsplit(settings.EXTRACTOR_URL).path or "/extract",
+        fallback_url=settings.EXTRACTOR_URL,
+        cache_seconds=settings.CONSUL_CACHE_SECONDS,
+        timeout_seconds=settings.CONSUL_TIMEOUT_SECONDS,
+    )
+
+
 _service = HTTPPDFExtractorService(
     url=settings.EXTRACTOR_URL,
     timeout_seconds=settings.EXTRACTOR_TIMEOUT_SECONDS,
     max_file_size_mb=settings.MAX_FILE_SIZE_MB,
+    resolver=_build_resolver(),
+    breaker=CircuitBreaker(
+        "extractor",
+        failure_threshold=settings.CIRCUIT_BREAKER_FAILURE_THRESHOLD,
+        recovery_timeout=settings.CIRCUIT_BREAKER_RECOVERY_SECONDS,
+    ),
 )
 
 # No se incluye el nombre del archivo: es un dato que elige quien sube el PDF
@@ -65,7 +91,11 @@ async def _extract_document(file_bytes: bytes, *, with_metadata: bool = True) ->
     except PDFValidationError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except ExtractorHTTPError as exc:
-        raise HTTPException(status_code=exc.status_code, detail=str(exc)) from exc
+        headers = None
+        if exc.retry_after is not None:
+            # Con el circuito abierto, el cliente sabe cuándo volver a intentar.
+            headers = {"Retry-After": str(math.ceil(exc.retry_after))}
+        raise HTTPException(status_code=exc.status_code, detail=str(exc), headers=headers) from exc
 
 
 @router.post(
