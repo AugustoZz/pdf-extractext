@@ -112,6 +112,7 @@ docker compose up --build
 ```
 La API estará lista y conectada a la base de datos automáticamente en `http://localhost:8000`.
 El extractor balanceado queda publicado en `http://localhost:8080/extract`.
+La UI de Consul queda en `http://localhost:8500` (servicios registrados, su salud y la configuración KV).
 Docker Compose inicia la API sin watcher de recarga para evitar consumir CPU
 vigilando los PDFs y resultados; tras editar código, usar `docker compose restart api`.
 Si algún puerto ya está en uso en tu máquina, cambialo en `.env` (ver la sección Docker Compose de `.env.example`).
@@ -205,6 +206,44 @@ falló la extracción.
 del servicio, configurar `EXTRACTOR_BUILD_CONTEXT=./.test-extractor` en `.env`;
 por defecto se usa el repositorio remoto. La copia local debe existir antes del build.
 
+### Consul: descubrimiento de servicios y configuración
+
+Compose levanta un agente de Consul (modo `-dev`, un nodo, datos en memoria) que cumple dos funciones:
+
+- **Descubrimiento:** [`consul/services.hcl`](consul/services.hcl) registra el extractor
+  (su punto de entrada, `extractor-lb`) y la API, cada uno con un health check HTTP.
+  La API no usa una dirección fija: le pide a Consul las instancias **sanas** del servicio
+  `extractor` (`/v1/health/service/extractor?passing=true`) y guarda la respuesta 10 s
+  para no sumar un salto de red por cada PDF. El extractor vive en otro repositorio y no
+  se registra solo; por eso el registro está en este compose.
+- **Configuración (factor III):** [`consul/seed-kv.sh`](consul/seed-kv.sh) carga claves
+  bajo `config/pdf-extractext/` (timeout, tamaño máximo, parámetros del circuit breaker,
+  nivel de log). Al arrancar, `Settings` lee esas claves y pisan a las variables de entorno.
+  Se cambian desde la UI de Consul y se aplican reiniciando la API, sin tocar el compose.
+
+Consul no es un punto único de falla: si no responde, la API usa las últimas instancias
+conocidas o, si no hay, `EXTRACTOR_URL`, y arranca con sus variables de entorno. Si Consul
+responde pero no hay ninguna instancia sana, la API devuelve 503 sin llamar al extractor.
+Las claves `CONSUL_*` (cómo llegar a Consul) sólo se configuran por entorno. Con
+`CONSUL_ENABLED=false` la app funciona como antes, sin Consul.
+
+### Circuit breaker hacia el extractor
+
+`HTTPPDFExtractorService` protege cada llamada con un circuit breaker propio
+([`app/services/resilience/circuit_breaker.py`](app/services/resilience/circuit_breaker.py)):
+
+| Estado | Qué pasa |
+|---|---|
+| Cerrado | Las llamadas pasan; se cuentan los fallos seguidos |
+| Abierto | Tras `CIRCUIT_BREAKER_FAILURE_THRESHOLD` fallos seguidos (5): responde 503 con `Retry-After`, sin llamar, durante `CIRCUIT_BREAKER_RECOVERY_SECONDS` (30 s) |
+| Semiabierto | Pasado ese tiempo deja pasar una llamada de prueba: si sale bien cierra, si falla vuelve a abrir |
+
+Cuentan como fallo los errores de conexión o timeout, los 5xx del extractor (incluido el
+503 por saturación) y las respuestas inválidas. Un PDF inválido (422) o demasiado grande
+(413) no cuenta: el extractor respondió bien y el problema es el archivo. Así, si el
+extractor se cae o se satura, la API deja de mandarle trabajo y le da tiempo a recuperarse
+en vez de acumular pedidos que van a vencer.
+
 El TP de **Test de Carga, Estrés y Optimización** se entrega en el repositorio del
 extractor: ahí están las pruebas con k6 y Vegeta, el informe, la evidencia de la corrida
 final y el contrato del servicio.
@@ -270,8 +309,8 @@ nuevamente garantiza que las subidas concurrentes no generen duplicados.
 |--------|----------------|
 | **I. Codebase** | Un repositorio Git, múltiples deploys |
 | **II. Dependencies** | `pyproject.toml` + `uv.lock` + `uv sync --frozen` |
-| **III. Config** | Variables de entorno vía `.env` (nunca en código) |
-| **IV. Backing Services** | MongoDB como recurso adjunto configurable |
+| **III. Config** | Variables de entorno vía `.env` y KV de Consul (nunca en código) |
+| **IV. Backing Services** | MongoDB y el extractor como recursos adjuntos; el extractor se descubre en Consul |
 | **V. Build/Release/Run** | Separación clara usando Docker y Docker Compose |
 | **VI. Processes** | La app es stateless — no guarda estado entre requests |
 | **VII. Port Binding** | FastAPI expone el servicio vía puerto configurable |

@@ -156,3 +156,33 @@ def test_extract_pdf_accepts_generic_content_type(mock_repo, mock_service, mock_
     )
 
     assert response.status_code == 201
+
+
+def test_open_circuit_returns_503_with_retry_after(mock_repo, mock_service, mock_checksum):
+    mock_checksum.return_value = "nuevo"
+    mock_repo.get_by_checksum = AsyncMock(return_value=None)
+    mock_service.extract.side_effect = ExtractorHTTPError("Circuito abierto", retry_after=12.3)
+
+    response = client.post(
+        "/api/v1/extract",
+        files={"file": ("test.pdf", b"%PDF-1.4...", "application/pdf")},
+    )
+
+    assert response.status_code == 503
+    # Retry-After va en segundos enteros; se redondea hacia arriba.
+    assert response.headers["retry-after"] == "13"
+    mock_repo.create.assert_not_called()
+
+
+def test_other_extractor_errors_have_no_retry_after(mock_repo, mock_service, mock_checksum):
+    mock_checksum.return_value = "nuevo"
+    mock_repo.get_by_checksum = AsyncMock(return_value=None)
+    mock_service.extract.side_effect = ExtractorHTTPError("Respuesta inválida", 502)
+
+    response = client.post(
+        "/api/v1/extract",
+        files={"file": ("test.pdf", b"%PDF-1.4...", "application/pdf")},
+    )
+
+    assert response.status_code == 502
+    assert "retry-after" not in response.headers

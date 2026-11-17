@@ -1,0 +1,4 @@
+# Los scripts que corren en contenedores Linux necesitan finales LF,
+# aunque el repo se clone en Windows con core.autocrlf=true.
+*.sh text eol=lf
+*.hcl text eol=lf
