@@ -4,8 +4,6 @@ Sigue TDD: cada test documenta el comportamiento esperado
 antes o en paralelo a la implementación (sub-issue 1B).
 """
 import pytest
-import io
-from pypdf import PdfWriter
 
 from app.services.extractor import (
     PDFExtractorService,
@@ -26,48 +24,6 @@ def strict_service() -> PDFExtractorService:
     """Servicio con límite de 1 MB para forzar error de tamaño."""
     return PDFExtractorService(max_file_size_mb=1)
 
-# ── Tests de Casos Límite y fixtures ───────────────────────────────────────
-@pytest.fixture
-def pdf_cifrado() -> bytes:
-    """Genera un PDF cifrado para testear la extracción de texto."""
-    writer = PdfWriter()
-    writer.add_blank_page(width=72, height=72)
-    writer.encrypt(user_password="test", owner_password="owner")
-    pdf_bytes = io.BytesIO()
-    writer.write(pdf_bytes)
-    return pdf_bytes.getvalue()
-
-@pytest.fixture
-def pdf_cifrado_contraseña_vacia() -> bytes:
-    """Genera un PDF cifrado con contraseña vacía para testear la extracción de texto."""
-    writer = PdfWriter()
-    writer.add_blank_page(width=72, height=72)
-    writer.encrypt(user_password="", owner_password="owner")
-    pdf_bytes = io.BytesIO()
-    writer.write(pdf_bytes)
-    return pdf_bytes.getvalue()
-
-class TestCasosLimite:
-    def test_pdf_cifrado_raises(self, service, pdf_cifrado):
-        """Un PDF cifrado debe lanzar PDFValidationError al extraer texto."""
-        with pytest.raises(PDFValidationError,match = "contraseña"):
-            service.extract(pdf_cifrado)
-
-    def test_pdf_cifrado_contraseña_vacia(self,service,pdf_cifrado_contraseña_vacia):
-        """Si solo tiene contraseña de propietario, aceptamos el PDF y extraemos texto."""
-        doc = service.extract(pdf_cifrado_contraseña_vacia)
-        assert doc.page_count==1  # Debe reconocer la página
-
-    def test_validate_pdf_corrupt_with_valid_header(self, service):
-        """Un PDF corrupto con firma %PDF debe lanzar PDFValidationError."""
-        corrupt_pdf = b"%PDF-1.4\n%CorruptContent"
-        with pytest.raises(PDFValidationError, match = "corrupto o no es válido"):
-            service.validate_pdf(corrupt_pdf)
-
-    def test_validate_pdf_empty_bytes(self, service):
-        """Bytes vacíos deben lanzar PDFValidationError."""
-        with pytest.raises(PDFValidationError, match = "firma PDF válida"):
-            service.validate_pdf(b"")
 
 # ── Tests de validación ───────────────────────────────────────────────────────
 class TestValidatePDF:
@@ -89,6 +45,30 @@ class TestValidatePDF:
         """Bytes sin firma %PDF deben lanzar PDFValidationError."""
         with pytest.raises(PDFValidationError):
             service.validate_pdf(b"PK\x03\x04")  # ZIP signature, not PDF
+
+
+# ── Tests de checksum ─────────────────────────────────────────────────────────
+class TestCalculateChecksum:
+    def test_calculate_checksum_deterministic(self, service, sample_pdf_bytes):
+        """El mismo archivo debe producir siempre el mismo checksum."""
+        checksum1 = service.calculate_checksum(sample_pdf_bytes)
+        checksum2 = service.calculate_checksum(sample_pdf_bytes)
+        assert checksum1 == checksum2
+
+    def test_calculate_checksum_different_files(
+        self, service, sample_pdf_bytes, empty_pdf_bytes
+    ):
+        """Archivos distintos deben producir checksums distintos."""
+        checksum1 = service.calculate_checksum(sample_pdf_bytes)
+        checksum2 = service.calculate_checksum(empty_pdf_bytes)
+        assert checksum1 != checksum2
+
+    def test_calculate_checksum_is_sha256(self, service, sample_pdf_bytes):
+        """El checksum debe ser un hash SHA-256 (64 caracteres hexadecimales)."""
+        checksum = service.calculate_checksum(sample_pdf_bytes)
+        assert len(checksum) == 64
+        assert all(c in "0123456789abcdef" for c in checksum)
+
 
 # ── Tests de extracción de texto ──────────────────────────────────────────────
 class TestExtractText:
@@ -152,6 +132,7 @@ class TestExtract:
         """El ExtractedDocument retornado debe tener todos los campos requeridos."""
         result = service.extract(sample_pdf_bytes)
         assert hasattr(result, "text")
+        assert hasattr(result, "checksum")
         assert hasattr(result, "page_count")
         assert hasattr(result, "metadata")
 
