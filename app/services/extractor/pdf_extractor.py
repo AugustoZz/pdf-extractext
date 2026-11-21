@@ -4,11 +4,13 @@ Servicio de extracción de texto desde archivos PDF.
 Principio SRP: esta clase SOLO se encarga de procesar PDFs.
 No persiste datos, no genera resúmenes ni interactúa con la API.
 """
+import hashlib
 import io
 import logging
 import re
 
-from pypdf import PasswordType, PdfReader
+import pypdf
+from pypdf import PdfReader
 from pypdf.errors import PdfReadError
 
 from app.services.extractor.models import ExtractedDocument
@@ -17,11 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class PDFValidationError(ValueError):
-    """Se lanza cuando el archivo no es un PDF válido."""
-
-
-class PDFTooLargeError(PDFValidationError):
-    """Se lanza cuando el archivo supera el tamaño máximo permitido."""
+    """Se lanza cuando el archivo no es un PDF válido o supera el tamaño máximo."""
 
 
 class PDFExtractorService:
@@ -30,6 +28,7 @@ class PDFExtractorService:
       1. Validar el PDF (formato y tamaño).
       2. Extraer texto de todas las páginas.
       3. Extraer metadatos del PDF.
+      4. Calcular el checksum SHA-256.
 
     Uso:
         service = PDFExtractorService(max_file_size_mb=10)
@@ -49,17 +48,17 @@ class PDFExtractorService:
             file_bytes: Contenido del PDF como bytes (sin escritura en disco).
 
         Returns:
-            ExtractedDocument con texto, page_count y metadata.
+            ExtractedDocument con texto, checksum, page_count y metadata.
 
         Raises:
-            PDFValidationError: Si el archivo no es un PDF válido.
-            PDFTooLargeError: Si el archivo supera el tamaño máximo.
+            PDFValidationError: Si el archivo no es PDF válido o es demasiado grande.
         """
         self.validate_pdf(file_bytes)
         reader = self._get_reader(file_bytes)
 
         return ExtractedDocument(
             text=self.extract_text(file_bytes),
+            checksum=self.calculate_checksum(file_bytes),
             page_count=len(reader.pages),
             metadata=self.extract_metadata(file_bytes),
         )
@@ -68,7 +67,7 @@ class PDFExtractorService:
 
     def validate_pdf(self, file_bytes: bytes) -> bool:
         """
-        Valida que los bytes correspondan a un PDF válido, que no requiera contraseña de apertura y dentro del límite de tamaño.
+        Valida que los bytes correspondan a un PDF válido y dentro del límite de tamaño.
 
         Args:
             file_bytes: Contenido del archivo.
@@ -80,18 +79,28 @@ class PDFExtractorService:
             PDFValidationError: Si el archivo no es válido.
         """
         if len(file_bytes) > self._max_bytes:
-            raise PDFTooLargeError(
+            raise PDFValidationError(
                 f"El archivo supera el tamaño máximo de {self._max_bytes // (1024 * 1024)} MB."
             )
         if not file_bytes.startswith(b"%PDF"):
             raise PDFValidationError("El archivo no tiene la firma PDF válida (%PDF).")
         try:
-            reader=self._get_reader(file_bytes)
+            self._get_reader(file_bytes)
         except PdfReadError as exc:
             raise PDFValidationError(f"El archivo PDF está corrupto o no es válido: {exc}") from exc
-        if reader.is_encrypted and reader.decrypt("") == PasswordType.NOT_DECRYPTED:
-            raise PDFValidationError("El archivo PDF está protegido con contraseña y no se puede procesar, quite la contraseña e intente de nuevo.")
         return True
+
+    def calculate_checksum(self, file_bytes: bytes) -> str:
+        """
+        Calcula el checksum SHA-256 del archivo.
+
+        Args:
+            file_bytes: Contenido del archivo.
+
+        Returns:
+            Hash SHA-256 en formato hexadecimal (64 caracteres).
+        """
+        return hashlib.sha256(file_bytes).hexdigest()
 
     def extract_text(self, file_bytes: bytes) -> str:
         """

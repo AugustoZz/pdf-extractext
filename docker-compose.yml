@@ -1,24 +1,18 @@
-# Los puertos del host son configurables (ver .env.example) por si ya están en uso.
 services:
   api:
     build: .
+    container_name: pdf-extractext-api
     ports:
-      - "${API_PORT:-8000}:8000"
+      - "8000:8000"
     environment:
       # Sobrescribimos el URI para que apunte al contenedor de MongoDB en lugar de localhost
       - MONGODB_URI=mongodb://mongodb:27017
       - MONGODB_DB_NAME=pdf_extractext
       - APP_NAME=pdf-extractext
-      - APP_ENV=${APP_ENV:-production}
+      - APP_ENV=development
       - LOG_LEVEL=INFO
       - MAX_FILE_SIZE_MB=10
       - PDF_ALLOWED_MIME_TYPE=application/pdf
-      - EXTRACTOR_URL=${EXTRACTOR_URL:-http://extractor-lb/extract}
-      - EXTRACTOR_TIMEOUT_SECONDS=${EXTRACTOR_TIMEOUT_SECONDS:-30}
-      # Consul: descubre el extractor y pisa la configuración con su KV.
-      # Con CONSUL_ENABLED=false la API vuelve a EXTRACTOR_URL y al entorno.
-      - CONSUL_ENABLED=${CONSUL_ENABLED:-true}
-      - CONSUL_URL=http://consul:8500
     depends_on:
       mongodb:
         # service_healthy (y no service_started) porque la API verifica la
@@ -26,46 +20,20 @@ services:
         # "started" sólo garantiza que el contenedor arrancó, no que mongod
         # haya terminado de inicializarse.
         condition: service_healthy
-      extractor-lb:
-        condition: service_started
-      # La API lee el KV al arrancar: tiene que estar cargado antes.
-      consul-init:
-        condition: service_completed_successfully
     volumes:
-      # Permite desarrollar sin reconstruir la imagen; reiniciar api tras editar.
+      # Sincroniza el código fuente para recarga en vivo (hot reload)
       - .:/app
-    # Sin watcher: la carga no consume CPU vigilando PDFs y archivos de resultados.
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      # Margen para el arranque: conexión a Mongo e índices.
-      start_period: 15s
-    deploy:
-      resources:
-        # El TP pide límites explícitos en cada contenedor. La api no participa de
-        # las pruebas de carga: con poco le alcanza y le deja CPU al extractor.
-        limits:
-          cpus: "0.5"
-          memory: 512M
+    # Reinicia uvicorn en modo watch para el desarrollo
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     restart: unless-stopped
 
   mongodb:
-    # Versión fija: `latest` puede cambiar entre entregas y romper la reproducibilidad.
-    image: mongo:9.0.4
+    image: mongo:latest
+    container_name: pdf-extractext-mongo
     ports:
-      # Expuesto para los tests de integración que corren desde el host.
-      - "${MONGO_PORT:-27017}:27017"
+      - "27017:27017"
     volumes:
       - mongo_data:/data/db
-    deploy:
-      resources:
-        limits:
-          cpus: "0.5"
-          # mongod ajusta su caché al límite del contenedor.
-          memory: 1G
     restart: always
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
@@ -74,86 +42,6 @@ services:
       retries: 12
       # Margen para el primer arranque, cuando mongod crea los archivos de datos.
       start_period: 30s
-
-  # ── Extractor ───────────────────────────────────────────────────
-  # Microservicio en su propio repositorio; Compose lo construye desde ahí.
-  # Las pruebas de carga, nginx y el informe del TP viven en ese repo:
-  # https://github.com/valendotjpg/pdf-extractext-extractor
-  # Sin ports: nginx distribuye las peticiones entre las cinco replicas.
-  extractor:
-    build: ${EXTRACTOR_BUILD_CONTEXT:-https://github.com/valendotjpg/pdf-extractext-extractor.git#492646ed9ab7a949019b16dbab021eefc2eddce9}
-    command: uvicorn extractor_service.main:app --host 0.0.0.0 --port 8000 --timeout-keep-alive 60 --no-access-log
-    deploy:
-      # El TP permite hasta 5 réplicas.
-      replicas: ${EXTRACTOR_REPLICAS:-5}
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1G
-    healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-    restart: unless-stopped
-
-  extractor-lb:
-    image: nginx:1.27-alpine
-    ports:
-      - "${EXTRACTOR_PORT:-8080}:80"
-    volumes:
-      - ./nginx/extractor.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      extractor:
-        condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 512M
-    restart: unless-stopped
-
-  # ── Consul ──────────────────────────────────────────────────────
-  # Descubrimiento de servicios (catálogo con health checks) y configuración
-  # centralizada (KV). Modo -dev: un solo nodo y datos en memoria; alcanza para
-  # el TP, no para producción. UI en http://localhost:8500
-  consul:
-    # Versión fija: 2.x mantiene la API HTTP v1 que usa la app.
-    image: hashicorp/consul:2.1.0
-    command: agent -dev -client=0.0.0.0 -config-dir=/consul/services
-    ports:
-      - "${CONSUL_PORT:-8500}:8500"
-    volumes:
-      - ./consul/services.hcl:/consul/services/services.hcl:ro
-    healthcheck:
-      test: ["CMD", "consul", "members"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    deploy:
-      resources:
-        limits:
-          cpus: "0.25"
-          memory: 256M
-    restart: unless-stopped
-
-  # Carga la configuración inicial en el KV y termina.
-  consul-init:
-    image: hashicorp/consul:2.1.0
-    entrypoint: ["/bin/sh", "/seed-kv.sh"]
-    environment:
-      - CONSUL_HTTP_ADDR=http://consul:8500
-    volumes:
-      - ./consul/seed-kv.sh:/seed-kv.sh:ro
-    depends_on:
-      consul:
-        condition: service_healthy
-    deploy:
-      resources:
-        limits:
-          cpus: "0.1"
-          memory: 64M
-    restart: "no"
 
 volumes:
   mongo_data:
