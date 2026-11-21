@@ -9,6 +9,24 @@
 
 ---
 
+## Etapa 1: el monolito (repositorio archivado)
+
+Este repositorio es **el monolito de la Etapa 1**: una sola aplicación FastAPI que sirve la
+interfaz, extrae el texto con pypdf y guarda los documentos en MongoDB. Está archivado, en
+solo lectura, y se conserva para poder levantar y comparar el antes y el después de la
+migración.
+
+- Versión: etiqueta [`monolito-v1`](https://github.com/Extractor-de-texto-PDF-Grupo-06/pdf-extractext/tree/monolito-v1).
+- El sistema actual, en microservicios con Traefik y Consul, se despliega desde
+  [`pdf-extractext-orchestration`](https://github.com/Extractor-de-texto-PDF-Grupo-06/pdf-extractext-orchestration),
+  donde están la especificación y las decisiones de arquitectura.
+- El código de la migración sigue, con todo este historial, en
+  [`pdf-extractext-documents`](https://github.com/Extractor-de-texto-PDF-Grupo-06/pdf-extractext-documents).
+
+Para levantarlo: `docker compose up -d --build` y abrir <http://localhost:8000>.
+
+---
+
 ## Descripción
 
 `pdf-extractext` permite a los usuarios enviar archivos PDF y obtener el texto extraído. El sistema valida el archivo, genera un checksum para evitar duplicados y persiste el contenido en una base de datos no relacional (MongoDB). Expone una API REST construida con FastAPI.
